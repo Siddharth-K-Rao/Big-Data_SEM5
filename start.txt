@@ -1,0 +1,8 @@
+bin/hdfs namenode -format
+sbin/start-dfs.sh
+bin/hdfs dfs -mkdir /user
+sbin/start-dfs.sh
+jps->should show 4 processes
+
+-------------------------------------
+bin/hdfs dfs -put intiallocoffile /Input

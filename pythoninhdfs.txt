@@ -1,0 +1,3 @@
+echo "csk,rr,rr,csk,dd,srh,srh,gl,mi,mi,mi,rr"|python3 mapper.py|sort|python3 reducer.py
+bin/hadoop jar '/home/sreyans/hadoop/share/hadoop/tools/lib/hadoop-streaming-3.2.0.jar' -mapper 'python3 /home/sreyans/Desktop/py/mapper.py' -reducer 'python3 /home/sreyans/Desktop/py/reducer.py' -input /Input -output /Output
+
