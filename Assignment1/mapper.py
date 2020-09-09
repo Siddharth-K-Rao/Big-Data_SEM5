@@ -28,10 +28,6 @@ def checkdraw(s):
 	for i in s:
 		if not(len(i)==2 and len(i[0])==len(i[1])):
 			return False
-		n=len(i[0])
-		for j in range(n):
-			if not(type(i[0][j])==int and type(i[1][j])==int):
-				return False
 	return True
 
 def checkall(line):
