@@ -10,7 +10,7 @@ def checkword(s):
     for i in s:
         if not(i.isalpha() or i==" "):
             return False
-    return True
+    return True if s!="" else False
 
 def checkcountry(s):
     if len(s)==2 and s[0]>='A' and s[0]<='Z' and s[1]>='A' and s[1]<='Z':
