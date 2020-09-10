@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 import sys
 rec=0
 nrec=0
