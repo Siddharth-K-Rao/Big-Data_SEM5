@@ -48,3 +48,4 @@ for line in sys.stdin:
             dist = math.sqrt((d['drawing'][0][0][0] ** 2) + (d['drawing'][0][1][0] ** 2))
             if dist > k:
                 print('%s\t%s'%(d['countrycode'],1))
+

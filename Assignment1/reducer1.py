@@ -22,3 +22,4 @@ for line in sys.stdin:
         count += 1
 if current_country:
     print(current_country,count,sep = ',')
+
