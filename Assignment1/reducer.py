@@ -12,7 +12,7 @@ for lines in sys.stdin:
     if word=='0':
         rec+=count
     else:
+        print(rec)
         nrec+=count
-print(rec)
 print(nrec)
 
