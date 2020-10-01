@@ -23,6 +23,6 @@ if initnode:
     k=str(val)
     if len(k[k.index("."):])<6:
                 k=k+"0"*(6-len(k[k.index("."):]))
-    v1_file.write(f"{initnode}, {k}\n")
+    v1_file.write(f"{initnode}, {k}")
 v1_file.close()
 
