@@ -8,7 +8,7 @@ for inputline in sys.stdin:
         continue
     try:
 	    #reading the graph edges and checking that they dont give an error
-        from_node,to_node=line.split(" ")
+        from_node,to_node=line.split("\t")
         print(from_node,to_node,sep=" ")
     except:
         #print("here")
