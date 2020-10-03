@@ -1,19 +1,17 @@
 #!/usr/bin/python3
 import sys
-
-#get the location of v file and opening it
-location=sys.argv[1]
-v_file = open(location,"w")
-
 cur_node=""
 cur_list=[]
-
+location=sys.argv[1]
+v_file = open(location,"w")
 for inputline in sys.stdin:
     line=inputline.strip()
     from_node,to_node=line.split(" ")
     if from_node!=cur_node:
         if cur_node!="":
-            cur_list = sorted(cur_list)
+            #print(cur_node,cur_list)
+            #cur_list.remove(int(cur_node))
+            #cur_list = sorted(cur_list) CHANGED
             cur_list = '['+",".join(cur_list)+']'
             print(cur_node,cur_list,sep="\t")
             cur_list=[]
@@ -33,7 +31,7 @@ if cur_node:
     #print(cur_node,cur_list)
     #cur_list.remove(int(cur_node))
     #print(cur_node,sorted(cur_list),sep="\t")
-    cur_list = sorted(cur_list)
+    #cur_list = sorted(cur_list)
     cur_list = '['+",".join(cur_list)+']'
     print(cur_node,cur_list,sep="\t")
 v_file.close()
