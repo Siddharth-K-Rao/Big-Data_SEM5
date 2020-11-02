@@ -35,6 +35,11 @@ For example in WordCount2.java(hadoop/examples) the main function is WordCount2.
 ->After this we need to convert to jar file: jar cf nameofjar.jar nameofjavafile*.class *cf* is to create a jar file
 ->After creation of jar file check its contents: jar tf nameofjar.jar
 ------------------------------------------------------------------------------------
+-> If data node is not appearing in jps command->usually after restarting the system
+-->First do format namenode, stop the services of hadoop.
+-->then go to the tmp folder of the system i.e. cd /tmp and delete all files starting with the hadoop name.
+-->now again go to hadoop, start all services, format the namenode and start all over again.
+----------------------------------------------------------------------------------------------------------------
 Running a JAR
 ->bin/hadoop jar examples/nameofjar.jar nameofjavafile /user/<username>/input/inputfilename /user/<username>/output.-> nameofjavafile no .java extension
 THe output shouldn't have defined by other programs or prededined.
