@@ -1,0 +1,6 @@
+->Enable history->present on some website.DAG's are saved there
+->localhost:18080->check history
+->DAG:
+---->Whole Stage Code GEn -> DataFrame-> JAVA CODE  for RDD
+---->Exchange->Shuffler -> has to be minimised bcoz data being sent between executors. It is a performance bottleneck
+---->MAP PArtitions->Serial Computations on the data present in the executors
