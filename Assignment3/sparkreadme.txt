@@ -4,3 +4,9 @@
 ---->Whole Stage Code GEn -> DataFrame-> JAVA CODE  for RDD
 ---->Exchange->Shuffler -> has to be minimised bcoz data being sent between executors. It is a performance bottleneck
 ---->MAP PArtitions->Serial Computations on the data present in the executors
+->SUBMISSIONS:
+------>1)WA->2nd one
+------>2)WA->removed the sys.error files part
+------>3)changed condition to <=k, WA
+------>4)changed condition to >k, WA
+------>5)Accepted -> Answer key was wrong
