@@ -25,5 +25,5 @@ for eachline in sys.stdin:
     for i in to_nodes:
         if i in node_list:
             print(i,val,sep=" ")
-    print(from_node,0,sep=" ")
+    print(from_node,0,sep=" ")#getting all the parent nodes also
     #print(to_nodes)

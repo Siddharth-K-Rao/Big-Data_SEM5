@@ -1,0 +1,2 @@
+VERY IMPORTANT to give a end-line character for spark streaming otherwise wont work.
+we decompiled the stream.pyc file and then made changes to the code and the file is present as utils.py in the same folder as stream.pyc
