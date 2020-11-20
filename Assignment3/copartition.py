@@ -9,14 +9,18 @@ if len(sys.argv) != 5:
         #print("Usage: pagerank <file> <iterations>", file=sys.stderr)
         sys.exit(-1)
 
-shape_file=spark.read.csv(sys.argv[3],header=True)
-shape_stat_file=spark.read.csv(sys.argv[4],header=True)
-print("\nHERE",shape_file.rdd.getNumPartitions(),shape_stat_file.rdd.getNumPartitions())
+shape_file=spark.read.csv(sys.argv[3],header=True).coalesce(5)
+shape_stat_file=spark.read.csv(sys.argv[4],header=True).coalesce(5)
 word=sys.argv[1]
 k=int(sys.argv[2])
 shape_file=shape_file.filter(shape_file.word==word)
-
+#shape_stat_file=shape_stat_file.rdd
+#shape_file=shape_file.rdd
+#print(shape_stat_file.take(2))
+#print(shape_file.take(2))
 final_csv=shape_file.join(shape_stat_file,shape_file.key_id==shape_stat_file.key_id)
+#final_csv=final_csv.toDF()
+#print(final_csv.take(10))
 final_csv=final_csv.filter((final_csv.recognized==False) & (final_csv.Total_Strokes<k))#we need to make separate parentheses for each condition and combining operator is '&' and not 'and'
 #print(final_csv.head(5))
 
