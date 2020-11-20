@@ -11,7 +11,7 @@ if len(sys.argv) != 5:
 
 shape_file=spark.read.csv(sys.argv[3],header=True)
 shape_stat_file=spark.read.csv(sys.argv[4],header=True)
-print("\nHERE",shape_file.rdd.getNumPartitions(),shape_stat_file.rdd.getNumPartitions())
+#print("\nHERE",shape_file.rdd.getNumPartitions(),shape_stat_file.rdd.getNumPartitions())
 word=sys.argv[1]
 k=int(sys.argv[2])
 shape_file=shape_file.filter(shape_file.word==word)
