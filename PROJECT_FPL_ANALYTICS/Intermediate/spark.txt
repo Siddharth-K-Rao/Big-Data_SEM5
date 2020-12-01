@@ -1,0 +1,687 @@
+20/12/01 17:02:54 WARN Utils: Your hostname, sreyans-VirtualBox resolves to a loopback address: 127.0.1.1; using 10.0.2.15 instead (on interface enp0s3)
+20/12/01 17:02:54 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+20/12/01 17:02:58 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+20/12/01 17:03:10 INFO SparkContext: Running Spark version 3.0.1
+20/12/01 17:03:11 INFO ResourceUtils: ==============================================================
+20/12/01 17:03:11 INFO ResourceUtils: Resources for spark.driver:
+
+20/12/01 17:03:11 INFO ResourceUtils: ==============================================================
+20/12/01 17:03:11 INFO SparkContext: Submitted application: FPL_analytics
+20/12/01 17:03:11 INFO SecurityManager: Changing view acls to: sreyans
+20/12/01 17:03:11 INFO SecurityManager: Changing modify acls to: sreyans
+20/12/01 17:03:11 INFO SecurityManager: Changing view acls groups to: 
+20/12/01 17:03:11 INFO SecurityManager: Changing modify acls groups to: 
+20/12/01 17:03:11 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(sreyans); groups with view permissions: Set(); users  with modify permissions: Set(sreyans); groups with modify permissions: Set()
+20/12/01 17:03:13 INFO Utils: Successfully started service 'sparkDriver' on port 37109.
+20/12/01 17:03:14 INFO SparkEnv: Registering MapOutputTracker
+20/12/01 17:03:14 INFO SparkEnv: Registering BlockManagerMaster
+20/12/01 17:03:14 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+20/12/01 17:03:14 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+20/12/01 17:03:14 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+20/12/01 17:03:14 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-b9ce2332-0784-438d-8003-8f402563f619
+20/12/01 17:03:14 INFO MemoryStore: MemoryStore started with capacity 413.9 MiB
+20/12/01 17:03:14 INFO SparkEnv: Registering OutputCommitCoordinator
+20/12/01 17:03:15 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+20/12/01 17:03:16 INFO SparkUI: Bound SparkUI to 0.0.0.0, and started at http://10.0.2.15:4040
+20/12/01 17:03:17 INFO Executor: Starting executor ID driver on host 10.0.2.15
+20/12/01 17:03:17 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 44367.
+20/12/01 17:03:17 INFO NettyBlockTransferService: Server created on 10.0.2.15:44367
+20/12/01 17:03:17 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+20/12/01 17:03:17 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 10.0.2.15, 44367, None)
+20/12/01 17:03:17 INFO BlockManagerMasterEndpoint: Registering block manager 10.0.2.15:44367 with 413.9 MiB RAM, BlockManagerId(driver, 10.0.2.15, 44367, None)
+20/12/01 17:03:17 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 10.0.2.15, 44367, None)
+20/12/01 17:03:18 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 10.0.2.15, 44367, None)
+20/12/01 17:03:19 INFO SingleEventLogFileWriter: Logging events to file:/tmp/spark/local-1606822396798.inprogress
+20/12/01 17:03:22 INFO SharedState: Setting hive.metastore.warehouse.dir ('null') to the value of spark.sql.warehouse.dir ('file:/usr/local/spark-3.0.1-bin-hadoop3.2/spark-warehouse').
+20/12/01 17:03:22 INFO SharedState: Warehouse path is 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/spark-warehouse'.
+20/12/01 17:03:25 INFO InMemoryFileIndex: It took 215 ms to list leaf files for 1 paths.
+20/12/01 17:03:25 INFO InMemoryFileIndex: It took 8 ms to list leaf files for 1 paths.
+20/12/01 17:03:34 INFO FileSourceStrategy: Pruning directories with: 
+20/12/01 17:03:34 INFO FileSourceStrategy: Pushed Filters: 
+20/12/01 17:03:34 INFO FileSourceStrategy: Post-Scan Filters: (length(trim(value#0, None)) > 0)
+20/12/01 17:03:34 INFO FileSourceStrategy: Output Data Schema: struct<value: string>
+20/12/01 17:03:36 INFO AsyncEventQueue: Process of event SparkListenerSQLExecutionStart(0,csv at NativeMethodAccessorImpl.java:0,org.apache.spark.sql.DataFrameReader.csv(DataFrameReader.scala:723)
+sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+java.lang.reflect.Method.invoke(Method.java:498)
+py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)
+py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+py4j.Gateway.invoke(Gateway.java:282)
+py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+py4j.commands.CallCommand.execute(CallCommand.java:79)
+py4j.GatewayConnection.run(GatewayConnection.java:238)
+java.lang.Thread.run(Thread.java:748),== Parsed Logical Plan ==
+GlobalLimit 1
++- LocalLimit 1
+   +- Filter (length(trim(value#6, None)) > 0)
+      +- Project [value#0 AS value#6]
+         +- Project [value#0]
+            +- Relation[value#0] text
+
+== Analyzed Logical Plan ==
+value: string
+GlobalLimit 1
++- LocalLimit 1
+   +- Filter (length(trim(value#6, None)) > 0)
+      +- Project [value#0 AS value#6]
+         +- Project [value#0]
+            +- Relation[value#0] text
+
+== Optimized Logical Plan ==
+GlobalLimit 1
++- LocalLimit 1
+   +- Filter (length(trim(value#0, None)) > 0)
+      +- Relation[value#0] text
+
+== Physical Plan ==
+CollectLimit 1
++- *(1) Filter (length(trim(value#0, None)) > 0)
+   +- FileScan text [value#0] Batched: false, DataFilters: [(length(trim(value#0, None)) > 0)], Format: Text, Location: InMemoryFileIndex[file:/home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<value:string>
+,org.apache.spark.sql.execution.SparkPlanInfo@ce798ca2,1606822414701) by listener EventLoggingListener took 1.561445395s.
+20/12/01 17:03:37 INFO CodeGenerator: Code generated in 804.605883 ms
+20/12/01 17:03:37 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 303.2 KiB, free 413.6 MiB)
+20/12/01 17:03:37 INFO MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 27.4 KiB, free 413.6 MiB)
+20/12/01 17:03:37 INFO BlockManagerInfo: Added broadcast_0_piece0 in memory on 10.0.2.15:44367 (size: 27.4 KiB, free: 413.9 MiB)
+20/12/01 17:03:37 INFO SparkContext: Created broadcast 0 from csv at NativeMethodAccessorImpl.java:0
+20/12/01 17:03:38 INFO FileSourceScanExec: Planning scan with bin packing, max size: 4238336 bytes, open cost is considered as scanning 4194304 bytes.
+20/12/01 17:03:38 INFO SparkContext: Starting job: csv at NativeMethodAccessorImpl.java:0
+20/12/01 17:03:38 INFO DAGScheduler: Got job 0 (csv at NativeMethodAccessorImpl.java:0) with 1 output partitions
+20/12/01 17:03:38 INFO DAGScheduler: Final stage: ResultStage 0 (csv at NativeMethodAccessorImpl.java:0)
+20/12/01 17:03:38 INFO DAGScheduler: Parents of final stage: List()
+20/12/01 17:03:38 INFO DAGScheduler: Missing parents: List()
+20/12/01 17:03:38 INFO DAGScheduler: Submitting ResultStage 0 (MapPartitionsRDD[3] at csv at NativeMethodAccessorImpl.java:0), which has no missing parents
+20/12/01 17:03:39 INFO MemoryStore: Block broadcast_1 stored as values in memory (estimated size 10.7 KiB, free 413.6 MiB)
+20/12/01 17:03:39 INFO MemoryStore: Block broadcast_1_piece0 stored as bytes in memory (estimated size 5.3 KiB, free 413.6 MiB)
+20/12/01 17:03:39 INFO BlockManagerInfo: Added broadcast_1_piece0 in memory on 10.0.2.15:44367 (size: 5.3 KiB, free: 413.9 MiB)
+20/12/01 17:03:39 INFO SparkContext: Created broadcast 1 from broadcast at DAGScheduler.scala:1223
+20/12/01 17:03:39 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 0 (MapPartitionsRDD[3] at csv at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+20/12/01 17:03:39 INFO TaskSchedulerImpl: Adding task set 0.0 with 1 tasks
+20/12/01 17:03:39 INFO TaskSetManager: Starting task 0.0 in stage 0.0 (TID 0, 10.0.2.15, executor driver, partition 0, PROCESS_LOCAL, 7778 bytes)
+20/12/01 17:03:39 INFO Executor: Running task 0.0 in stage 0.0 (TID 0)
+20/12/01 17:03:41 INFO FileScanRDD: Reading File path: file:///home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv, range: 0-44032, partition values: [empty row]
+20/12/01 17:03:41 INFO CodeGenerator: Code generated in 76.191265 ms
+20/12/01 17:03:41 INFO Executor: Finished task 0.0 in stage 0.0 (TID 0). 1659 bytes result sent to driver
+20/12/01 17:03:41 INFO TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 2194 ms on 10.0.2.15 (executor driver) (1/1)
+20/12/01 17:03:41 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool 
+20/12/01 17:03:41 INFO DAGScheduler: ResultStage 0 (csv at NativeMethodAccessorImpl.java:0) finished in 2.989 s
+20/12/01 17:03:42 INFO DAGScheduler: Job 0 is finished. Cancelling potential speculative or zombie tasks for this job
+20/12/01 17:03:42 INFO TaskSchedulerImpl: Killing all running tasks in stage 0: Stage finished
+20/12/01 17:03:42 INFO DAGScheduler: Job 0 finished: csv at NativeMethodAccessorImpl.java:0, took 3.283326 s
+20/12/01 17:03:42 INFO CodeGenerator: Code generated in 63.664499 ms
+20/12/01 17:03:42 INFO FileSourceStrategy: Pruning directories with: 
+20/12/01 17:03:42 INFO FileSourceStrategy: Pushed Filters: 
+20/12/01 17:03:42 INFO FileSourceStrategy: Post-Scan Filters: 
+20/12/01 17:03:42 INFO FileSourceStrategy: Output Data Schema: struct<value: string>
+20/12/01 17:03:42 INFO MemoryStore: Block broadcast_2 stored as values in memory (estimated size 303.2 KiB, free 413.3 MiB)
+20/12/01 17:03:42 INFO MemoryStore: Block broadcast_2_piece0 stored as bytes in memory (estimated size 27.4 KiB, free 413.3 MiB)
+20/12/01 17:03:42 INFO BlockManagerInfo: Added broadcast_2_piece0 in memory on 10.0.2.15:44367 (size: 27.4 KiB, free: 413.9 MiB)
+20/12/01 17:03:42 INFO SparkContext: Created broadcast 2 from csv at NativeMethodAccessorImpl.java:0
+20/12/01 17:03:42 INFO FileSourceScanExec: Planning scan with bin packing, max size: 4238336 bytes, open cost is considered as scanning 4194304 bytes.
+20/12/01 17:03:43 INFO FileSourceStrategy: Pruning directories with: 
+20/12/01 17:03:43 INFO FileSourceStrategy: Pushed Filters: 
+20/12/01 17:03:43 INFO FileSourceStrategy: Post-Scan Filters: 
+20/12/01 17:03:43 INFO FileSourceStrategy: Output Data Schema: struct<name: string, Id: string>
+20/12/01 17:03:43 INFO CodeGenerator: Code generated in 57.575228 ms
+20/12/01 17:03:43 INFO MemoryStore: Block broadcast_3 stored as values in memory (estimated size 303.2 KiB, free 413.0 MiB)
+20/12/01 17:03:43 INFO MemoryStore: Block broadcast_3_piece0 stored as bytes in memory (estimated size 27.4 KiB, free 412.9 MiB)
+20/12/01 17:03:43 INFO BlockManagerInfo: Added broadcast_3_piece0 in memory on 10.0.2.15:44367 (size: 27.4 KiB, free: 413.8 MiB)
+20/12/01 17:03:43 INFO SparkContext: Created broadcast 3 from javaToPython at NativeMethodAccessorImpl.java:0
+20/12/01 17:03:43 INFO FileSourceScanExec: Planning scan with bin packing, max size: 4238336 bytes, open cost is considered as scanning 4194304 bytes.
+20/12/01 17:03:43 INFO SparkContext: Starting job: collectAsMap at /home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/mainspark.py:274
+20/12/01 17:03:43 INFO DAGScheduler: Got job 1 (collectAsMap at /home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/mainspark.py:274) with 1 output partitions
+20/12/01 17:03:43 INFO DAGScheduler: Final stage: ResultStage 1 (collectAsMap at /home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/mainspark.py:274)
+20/12/01 17:03:43 INFO DAGScheduler: Parents of final stage: List()
+20/12/01 17:03:43 INFO DAGScheduler: Missing parents: List()
+20/12/01 17:03:43 INFO DAGScheduler: Submitting ResultStage 1 (MapPartitionsRDD[15] at javaToPython at NativeMethodAccessorImpl.java:0), which has no missing parents
+20/12/01 17:03:43 INFO MemoryStore: Block broadcast_4 stored as values in memory (estimated size 14.0 KiB, free 412.9 MiB)
+20/12/01 17:03:43 INFO MemoryStore: Block broadcast_4_piece0 stored as bytes in memory (estimated size 7.0 KiB, free 412.9 MiB)
+20/12/01 17:03:43 INFO BlockManagerInfo: Added broadcast_4_piece0 in memory on 10.0.2.15:44367 (size: 7.0 KiB, free: 413.8 MiB)
+20/12/01 17:03:43 INFO SparkContext: Created broadcast 4 from broadcast at DAGScheduler.scala:1223
+20/12/01 17:03:43 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 1 (MapPartitionsRDD[15] at javaToPython at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+20/12/01 17:03:43 INFO TaskSchedulerImpl: Adding task set 1.0 with 1 tasks
+20/12/01 17:03:43 INFO TaskSetManager: Starting task 0.0 in stage 1.0 (TID 1, 10.0.2.15, executor driver, partition 0, PROCESS_LOCAL, 7778 bytes)
+20/12/01 17:03:43 INFO Executor: Running task 0.0 in stage 1.0 (TID 1)
+20/12/01 17:03:44 INFO FileScanRDD: Reading File path: file:///home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv, range: 0-44032, partition values: [empty row]
+20/12/01 17:03:44 INFO CodeGenerator: Code generated in 66.578848 ms
+20/12/01 17:03:44 INFO Executor: Finished task 0.0 in stage 1.0 (TID 1). 37088 bytes result sent to driver
+20/12/01 17:03:44 INFO TaskSetManager: Finished task 0.0 in stage 1.0 (TID 1) in 817 ms on 10.0.2.15 (executor driver) (1/1)
+20/12/01 17:03:44 INFO DAGScheduler: ResultStage 1 (collectAsMap at /home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/mainspark.py:274) finished in 0.876 s
+20/12/01 17:03:44 INFO DAGScheduler: Job 1 is finished. Cancelling potential speculative or zombie tasks for this job
+20/12/01 17:03:44 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool 
+20/12/01 17:03:44 INFO TaskSchedulerImpl: Killing all running tasks in stage 1: Stage finished
+20/12/01 17:03:44 INFO DAGScheduler: Job 1 finished: collectAsMap at /home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/mainspark.py:274, took 0.896447 s
+20/12/01 17:03:44 INFO MemoryStore: Block broadcast_5 stored as values in memory (estimated size 312.0 B, free 412.9 MiB)
+20/12/01 17:03:44 INFO MemoryStore: Block broadcast_5_piece0 stored as bytes in memory (estimated size 14.0 KiB, free 412.9 MiB)
+20/12/01 17:03:44 INFO BlockManagerInfo: Added broadcast_5_piece0 in memory on 10.0.2.15:44367 (size: 14.0 KiB, free: 413.8 MiB)
+20/12/01 17:03:44 INFO SparkContext: Created broadcast 5 from broadcast at NativeMethodAccessorImpl.java:0
+20/12/01 17:03:46 INFO FileBasedWriteAheadLog_ReceivedBlockTracker: Recovered 202 write ahead log files from file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/receivedBlockMetadata
+20/12/01 17:03:46 INFO ReceiverTracker: Starting 1 receivers
+20/12/01 17:03:46 INFO ReceiverTracker: ReceiverTracker started
+20/12/01 17:03:46 INFO PythonStateDStream: Checkpoint interval automatically set to 16000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Checkpoint interval automatically set to 16000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformedDStream@2fb85374
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformed2DStream@3b7ce78
+20/12/01 17:03:46 INFO PythonTransformedDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformedDStream@682bcd8a
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformed2DStream@33dc138f
+20/12/01 17:03:46 INFO PythonTransformedDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformedDStream@e74842c
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformed2DStream@ebc17b
+20/12/01 17:03:46 INFO PythonTransformedDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformedDStream@341dba94
+20/12/01 17:03:46 INFO SocketInputDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformedDStream@66f8d451
+20/12/01 17:03:46 INFO PythonTransformedDStream: Duration for remembering RDDs set to 32000 ms for org.apache.spark.streaming.api.python.PythonTransformedDStream@7e91271e
+20/12/01 17:03:46 INFO SocketInputDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO SocketInputDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO SocketInputDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Initialized and validated org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@7e91271e
+20/12/01 17:03:46 INFO ForEachDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO ForEachDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO ForEachDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO ForEachDStream: Remember interval = 8000 ms
+20/12/01 17:03:46 INFO ForEachDStream: Initialized and validated org.apache.spark.streaming.dstream.ForEachDStream@1fe864c9
+20/12/01 17:03:46 INFO SocketInputDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO SocketInputDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO SocketInputDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Initialized and validated org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@341dba94
+20/12/01 17:03:46 INFO SocketInputDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO SocketInputDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO SocketInputDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Initialized and validated org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@66f8d451
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformed2DStream@ebc17b
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@e74842c
+20/12/01 17:03:46 INFO SocketInputDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO SocketInputDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO SocketInputDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Initialized and validated org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@341dba94
+20/12/01 17:03:46 INFO SocketInputDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO SocketInputDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO SocketInputDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Initialized and validated org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@66f8d451
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformed2DStream@ebc17b
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@e74842c
+20/12/01 17:03:46 INFO PythonStateDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Storage level = Memory Deserialized 1x Replicated
+20/12/01 17:03:46 INFO PythonStateDStream: Checkpoint interval = 16000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonStateDStream@2dbccdae
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformed2DStream@33dc138f
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@682bcd8a
+20/12/01 17:03:46 INFO SocketInputDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO SocketInputDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO SocketInputDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO SocketInputDStream: Initialized and validated org.apache.spark.streaming.dstream.SocketInputDStream@6915d0eb
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@7e91271e
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformed2DStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformed2DStream@3b7ce78
+20/12/01 17:03:46 INFO PythonTransformedDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO PythonTransformedDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO PythonTransformedDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonTransformedDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonTransformedDStream@2fb85374
+20/12/01 17:03:46 INFO PythonStateDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Storage level = Memory Deserialized 1x Replicated
+20/12/01 17:03:46 INFO PythonStateDStream: Checkpoint interval = 16000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Remember interval = 32000 ms
+20/12/01 17:03:46 INFO PythonStateDStream: Initialized and validated org.apache.spark.streaming.api.python.PythonStateDStream@56b3f404
+20/12/01 17:03:46 INFO ForEachDStream: Slide time = 8000 ms
+20/12/01 17:03:46 INFO ForEachDStream: Storage level = Serialized 1x Replicated
+20/12/01 17:03:46 INFO ForEachDStream: Checkpoint interval = null
+20/12/01 17:03:46 INFO ForEachDStream: Remember interval = 8000 ms
+20/12/01 17:03:46 INFO ForEachDStream: Initialized and validated org.apache.spark.streaming.dstream.ForEachDStream@24f9326b
+20/12/01 17:03:46 INFO DAGScheduler: Got job 2 (start at NativeMethodAccessorImpl.java:0) with 1 output partitions
+20/12/01 17:03:46 INFO DAGScheduler: Final stage: ResultStage 2 (start at NativeMethodAccessorImpl.java:0)
+20/12/01 17:03:46 INFO DAGScheduler: Parents of final stage: List()
+20/12/01 17:03:46 INFO DAGScheduler: Missing parents: List()
+20/12/01 17:03:46 INFO DAGScheduler: Submitting ResultStage 2 (Receiver 0 ParallelCollectionRDD[16] at makeRDD at ReceiverTracker.scala:609), which has no missing parents
+20/12/01 17:03:46 INFO ReceiverTracker: Receiver 0 started
+20/12/01 17:03:46 INFO MemoryStore: Block broadcast_6 stored as values in memory (estimated size 81.6 KiB, free 412.8 MiB)
+20/12/01 17:03:46 INFO MemoryStore: Block broadcast_6_piece0 stored as bytes in memory (estimated size 28.6 KiB, free 412.8 MiB)
+20/12/01 17:03:46 INFO BlockManagerInfo: Added broadcast_6_piece0 in memory on 10.0.2.15:44367 (size: 28.6 KiB, free: 413.8 MiB)
+20/12/01 17:03:46 INFO SparkContext: Created broadcast 6 from broadcast at DAGScheduler.scala:1223
+20/12/01 17:03:46 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 2 (Receiver 0 ParallelCollectionRDD[16] at makeRDD at ReceiverTracker.scala:609) (first 15 tasks are for partitions Vector(0))
+20/12/01 17:03:46 INFO TaskSchedulerImpl: Adding task set 2.0 with 1 tasks
+20/12/01 17:03:46 INFO TaskSetManager: Starting task 0.0 in stage 2.0 (TID 2, 10.0.2.15, executor driver, partition 0, PROCESS_LOCAL, 8350 bytes)
+20/12/01 17:03:46 INFO Executor: Running task 0.0 in stage 2.0 (TID 2)
+20/12/01 17:03:46 INFO RecurringTimer: Started timer for JobGenerator at time 1606822432000
+20/12/01 17:03:46 INFO JobGenerator: Started JobGenerator at 1606822432000 ms
+20/12/01 17:03:46 INFO JobScheduler: Started JobScheduler
+20/12/01 17:03:46 INFO StreamingContext: StreamingContext started
+20/12/01 17:03:47 INFO RecurringTimer: Started timer for BlockGenerator at time 1606822427200
+20/12/01 17:03:47 INFO BlockGenerator: Started BlockGenerator
+20/12/01 17:03:47 INFO BlockGenerator: Started block pushing thread
+20/12/01 17:03:47 INFO ReceiverTracker: Registered receiver for stream 0 from 10.0.2.15:37109
+20/12/01 17:03:47 INFO ReceiverSupervisorImpl: Starting receiver 0
+20/12/01 17:03:47 INFO SocketReceiver: Connecting to localhost:6100
+20/12/01 17:03:47 INFO SocketReceiver: Connected to localhost:6100
+20/12/01 17:03:47 INFO ReceiverSupervisorImpl: Called receiver 0 onStart
+20/12/01 17:03:47 INFO ReceiverSupervisorImpl: Waiting for receiver to be stopped
+20/12/01 17:03:47 INFO MemoryStore: Block input-0-1606822427200 stored as values in memory (estimated size 515.4 KiB, free 412.3 MiB)
+20/12/01 17:03:47 INFO BlockManagerInfo: Added input-0-1606822427200 in memory on 10.0.2.15:44367 (size: 515.4 KiB, free: 413.3 MiB)
+20/12/01 17:03:47 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:03:47 WARN BlockManager: Block input-0-1606822427200 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:03:47 INFO BlockGenerator: Pushed block input-0-1606822427200
+20/12/01 17:03:52 INFO PythonStateDStream: Time 1606822424000 ms is invalid as zeroTime is 1606822424000 ms , slideDuration is 8000 ms and difference is 0 ms
+20/12/01 17:03:52 INFO PythonStateDStream: Time 1606822424000 ms is invalid as zeroTime is 1606822424000 ms , slideDuration is 8000 ms and difference is 0 ms
+20/12/01 17:03:53 INFO JobScheduler: Added jobs for time 1606822432000 ms
+20/12/01 17:03:53 INFO JobGenerator: Checkpointing graph for time 1606822432000 ms
+20/12/01 17:03:53 INFO DStreamGraph: Updating checkpoint data for time 1606822432000 ms
+20/12/01 17:03:53 INFO JobScheduler: Starting job streaming job 1606822432000 ms.0 from job set of time 1606822432000 ms
+20/12/01 17:03:53 INFO DStreamGraph: Updated checkpoint data for time 1606822432000 ms
+20/12/01 17:03:53 INFO SparkContext: Starting job: runJob at PythonRDD.scala:154
+20/12/01 17:03:53 INFO DAGScheduler: Got job 3 (runJob at PythonRDD.scala:154) with 1 output partitions
+20/12/01 17:03:53 INFO DAGScheduler: Final stage: ResultStage 3 (runJob at PythonRDD.scala:154)
+20/12/01 17:03:53 INFO DAGScheduler: Parents of final stage: List()
+20/12/01 17:03:53 INFO DAGScheduler: Missing parents: List()
+20/12/01 17:03:53 INFO DAGScheduler: Submitting ResultStage 3 (PythonRDD[65] at RDD at PythonRDD.scala:53), which has no missing parents
+20/12/01 17:03:53 INFO CheckpointWriter: Submitted checkpoint of time 1606822432000 ms to writer queue
+20/12/01 17:03:53 INFO MemoryStore: Block broadcast_7 stored as values in memory (estimated size 6.9 KiB, free 412.3 MiB)
+20/12/01 17:03:53 INFO CheckpointWriter: Saving checkpoint for time 1606822432000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822432000'
+20/12/01 17:03:53 INFO MemoryStore: Block broadcast_7_piece0 stored as bytes in memory (estimated size 4.1 KiB, free 412.3 MiB)
+20/12/01 17:03:53 INFO BlockManagerInfo: Added broadcast_7_piece0 in memory on 10.0.2.15:44367 (size: 4.1 KiB, free: 413.3 MiB)
+20/12/01 17:03:53 INFO SparkContext: Created broadcast 7 from broadcast at DAGScheduler.scala:1223
+20/12/01 17:03:53 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 3 (PythonRDD[65] at RDD at PythonRDD.scala:53) (first 15 tasks are for partitions Vector(0))
+20/12/01 17:03:53 INFO TaskSchedulerImpl: Adding task set 3.0 with 1 tasks
+20/12/01 17:03:54 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803352000
+20/12/01 17:03:54 INFO CheckpointWriter: Checkpoint for time 1606822432000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822432000', took 13831 bytes and 580 ms
+20/12/01 17:03:55 INFO MemoryStore: Block input-0-1606822435200 stored as values in memory (estimated size 464.6 KiB, free 411.8 MiB)
+20/12/01 17:03:55 INFO BlockManagerInfo: Added input-0-1606822435200 in memory on 10.0.2.15:44367 (size: 464.6 KiB, free: 412.8 MiB)
+20/12/01 17:03:55 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:03:55 WARN BlockManager: Block input-0-1606822435200 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:03:55 INFO BlockGenerator: Pushed block input-0-1606822435200
+20/12/01 17:04:00 INFO PythonStateDStream: Marking RDD 96 for time 1606822440000 ms for checkpointing
+20/12/01 17:04:01 INFO PythonStateDStream: Marking RDD 125 for time 1606822440000 ms for checkpointing
+20/12/01 17:04:01 INFO JobScheduler: Added jobs for time 1606822440000 ms
+20/12/01 17:04:01 INFO JobGenerator: Checkpointing graph for time 1606822440000 ms
+20/12/01 17:04:01 INFO DStreamGraph: Updating checkpoint data for time 1606822440000 ms
+20/12/01 17:04:01 INFO DStreamGraph: Updated checkpoint data for time 1606822440000 ms
+20/12/01 17:04:01 INFO CheckpointWriter: Submitted checkpoint of time 1606822440000 ms to writer queue
+20/12/01 17:04:01 INFO CheckpointWriter: Saving checkpoint for time 1606822440000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822440000'
+20/12/01 17:04:01 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803360000
+20/12/01 17:04:01 INFO CheckpointWriter: Checkpoint for time 1606822440000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822440000', took 13843 bytes and 80 ms
+20/12/01 17:04:03 INFO MemoryStore: Block input-0-1606822443200 stored as values in memory (estimated size 173.4 KiB, free 411.7 MiB)
+20/12/01 17:04:03 INFO BlockManagerInfo: Added input-0-1606822443200 in memory on 10.0.2.15:44367 (size: 173.4 KiB, free: 412.7 MiB)
+20/12/01 17:04:03 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:03 WARN BlockManager: Block input-0-1606822443200 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:03 INFO BlockGenerator: Pushed block input-0-1606822443200
+20/12/01 17:04:03 INFO MemoryStore: Block input-0-1606822443400 stored as values in memory (estimated size 280.7 KiB, free 411.4 MiB)
+20/12/01 17:04:03 INFO BlockManagerInfo: Added input-0-1606822443400 in memory on 10.0.2.15:44367 (size: 280.7 KiB, free: 412.4 MiB)
+20/12/01 17:04:03 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:03 WARN BlockManager: Block input-0-1606822443400 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:03 INFO BlockGenerator: Pushed block input-0-1606822443400
+20/12/01 17:04:09 INFO JobScheduler: Added jobs for time 1606822448000 ms
+20/12/01 17:04:09 INFO JobGenerator: Checkpointing graph for time 1606822448000 ms
+20/12/01 17:04:09 INFO DStreamGraph: Updating checkpoint data for time 1606822448000 ms
+20/12/01 17:04:09 INFO DStreamGraph: Updated checkpoint data for time 1606822448000 ms
+20/12/01 17:04:09 INFO CheckpointWriter: Submitted checkpoint of time 1606822448000 ms to writer queue
+20/12/01 17:04:09 INFO CheckpointWriter: Saving checkpoint for time 1606822448000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822448000'
+20/12/01 17:04:09 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803368000
+20/12/01 17:04:09 INFO CheckpointWriter: Checkpoint for time 1606822448000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822448000', took 13846 bytes and 59 ms
+20/12/01 17:04:11 INFO MemoryStore: Block input-0-1606822451400 stored as values in memory (estimated size 443.4 KiB, free 411.0 MiB)
+20/12/01 17:04:11 INFO BlockManagerInfo: Added input-0-1606822451400 in memory on 10.0.2.15:44367 (size: 443.4 KiB, free: 412.0 MiB)
+20/12/01 17:04:11 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:11 WARN BlockManager: Block input-0-1606822451400 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:11 INFO BlockGenerator: Pushed block input-0-1606822451400
+20/12/01 17:04:16 INFO PythonStateDStream: Marking RDD 216 for time 1606822456000 ms for checkpointing
+20/12/01 17:04:17 INFO PythonStateDStream: Marking RDD 245 for time 1606822456000 ms for checkpointing
+20/12/01 17:04:17 INFO JobScheduler: Added jobs for time 1606822456000 ms
+20/12/01 17:04:17 INFO JobGenerator: Checkpointing graph for time 1606822456000 ms
+20/12/01 17:04:17 INFO DStreamGraph: Updating checkpoint data for time 1606822456000 ms
+20/12/01 17:04:17 INFO DStreamGraph: Updated checkpoint data for time 1606822456000 ms
+20/12/01 17:04:17 INFO CheckpointWriter: Submitted checkpoint of time 1606822456000 ms to writer queue
+20/12/01 17:04:17 INFO CheckpointWriter: Saving checkpoint for time 1606822456000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822456000'
+20/12/01 17:04:17 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803376000
+20/12/01 17:04:17 INFO CheckpointWriter: Checkpoint for time 1606822456000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822456000', took 13853 bytes and 65 ms
+20/12/01 17:04:19 INFO MemoryStore: Block input-0-1606822459400 stored as values in memory (estimated size 56.0 KiB, free 410.9 MiB)
+20/12/01 17:04:19 INFO BlockManagerInfo: Added input-0-1606822459400 in memory on 10.0.2.15:44367 (size: 56.0 KiB, free: 411.9 MiB)
+20/12/01 17:04:19 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:19 WARN BlockManager: Block input-0-1606822459400 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:19 INFO BlockGenerator: Pushed block input-0-1606822459400
+20/12/01 17:04:19 INFO MemoryStore: Block input-0-1606822459600 stored as values in memory (estimated size 424.0 KiB, free 410.5 MiB)
+20/12/01 17:04:19 INFO BlockManagerInfo: Added input-0-1606822459600 in memory on 10.0.2.15:44367 (size: 424.0 KiB, free: 411.5 MiB)
+20/12/01 17:04:19 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:19 WARN BlockManager: Block input-0-1606822459600 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:19 INFO BlockGenerator: Pushed block input-0-1606822459600
+20/12/01 17:04:24 INFO JobScheduler: Added jobs for time 1606822464000 ms
+20/12/01 17:04:24 INFO JobGenerator: Checkpointing graph for time 1606822464000 ms
+20/12/01 17:04:24 INFO DStreamGraph: Updating checkpoint data for time 1606822464000 ms
+20/12/01 17:04:24 INFO DStreamGraph: Updated checkpoint data for time 1606822464000 ms
+20/12/01 17:04:24 INFO CheckpointWriter: Submitted checkpoint of time 1606822464000 ms to writer queue
+20/12/01 17:04:24 INFO CheckpointWriter: Saving checkpoint for time 1606822464000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822464000'
+20/12/01 17:04:24 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803384000
+20/12/01 17:04:24 INFO CheckpointWriter: Checkpoint for time 1606822464000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822464000', took 13856 bytes and 48 ms
+20/12/01 17:04:27 INFO MemoryStore: Block input-0-1606822467600 stored as values in memory (estimated size 208.9 KiB, free 410.3 MiB)
+20/12/01 17:04:27 INFO BlockManagerInfo: Added input-0-1606822467600 in memory on 10.0.2.15:44367 (size: 208.9 KiB, free: 411.3 MiB)
+20/12/01 17:04:27 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:27 WARN BlockManager: Block input-0-1606822467600 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:27 INFO BlockGenerator: Pushed block input-0-1606822467600
+20/12/01 17:04:28 INFO MemoryStore: Block input-0-1606822467800 stored as values in memory (estimated size 272.7 KiB, free 410.0 MiB)
+20/12/01 17:04:28 INFO BlockManagerInfo: Added input-0-1606822467800 in memory on 10.0.2.15:44367 (size: 272.7 KiB, free: 411.0 MiB)
+20/12/01 17:04:28 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:28 WARN BlockManager: Block input-0-1606822467800 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:28 INFO BlockGenerator: Pushed block input-0-1606822467800
+20/12/01 17:04:32 INFO PythonStateDStream: Marking RDD 336 for time 1606822472000 ms for checkpointing
+20/12/01 17:04:32 INFO PythonStateDStream: Marking RDD 365 for time 1606822472000 ms for checkpointing
+20/12/01 17:04:32 INFO JobScheduler: Added jobs for time 1606822472000 ms
+20/12/01 17:04:32 INFO JobGenerator: Checkpointing graph for time 1606822472000 ms
+20/12/01 17:04:32 INFO DStreamGraph: Updating checkpoint data for time 1606822472000 ms
+20/12/01 17:04:32 INFO DStreamGraph: Updated checkpoint data for time 1606822472000 ms
+20/12/01 17:04:32 INFO CheckpointWriter: Submitted checkpoint of time 1606822472000 ms to writer queue
+20/12/01 17:04:32 INFO CheckpointWriter: Saving checkpoint for time 1606822472000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822472000'
+20/12/01 17:04:32 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803544000
+20/12/01 17:04:32 INFO CheckpointWriter: Checkpoint for time 1606822472000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822472000', took 13866 bytes and 47 ms
+20/12/01 17:04:36 INFO MemoryStore: Block input-0-1606822475800 stored as values in memory (estimated size 507.3 KiB, free 409.5 MiB)
+20/12/01 17:04:36 INFO BlockManagerInfo: Added input-0-1606822475800 in memory on 10.0.2.15:44367 (size: 507.3 KiB, free: 410.5 MiB)
+20/12/01 17:04:36 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:36 WARN BlockManager: Block input-0-1606822475800 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:36 INFO BlockGenerator: Pushed block input-0-1606822475800
+20/12/01 17:04:41 INFO JobScheduler: Added jobs for time 1606822480000 ms
+20/12/01 17:04:41 INFO JobGenerator: Checkpointing graph for time 1606822480000 ms
+20/12/01 17:04:41 INFO DStreamGraph: Updating checkpoint data for time 1606822480000 ms
+20/12/01 17:04:41 INFO DStreamGraph: Updated checkpoint data for time 1606822480000 ms
+20/12/01 17:04:41 INFO CheckpointWriter: Submitted checkpoint of time 1606822480000 ms to writer queue
+20/12/01 17:04:41 INFO CheckpointWriter: Saving checkpoint for time 1606822480000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822480000'
+20/12/01 17:04:41 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606803552000
+20/12/01 17:04:41 INFO CheckpointWriter: Checkpoint for time 1606822480000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822480000', took 13870 bytes and 66 ms
+20/12/01 17:04:44 INFO MemoryStore: Block input-0-1606822483800 stored as values in memory (estimated size 81.1 KiB, free 409.4 MiB)
+20/12/01 17:04:44 INFO BlockManagerInfo: Added input-0-1606822483800 in memory on 10.0.2.15:44367 (size: 81.1 KiB, free: 410.4 MiB)
+20/12/01 17:04:44 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:44 WARN BlockManager: Block input-0-1606822483800 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:44 INFO BlockGenerator: Pushed block input-0-1606822483800
+20/12/01 17:04:44 INFO MemoryStore: Block input-0-1606822484000 stored as values in memory (estimated size 380.0 KiB, free 409.1 MiB)
+20/12/01 17:04:44 INFO BlockManagerInfo: Added input-0-1606822484000 in memory on 10.0.2.15:44367 (size: 380.0 KiB, free: 410.1 MiB)
+20/12/01 17:04:44 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:44 WARN BlockManager: Block input-0-1606822484000 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:44 INFO BlockGenerator: Pushed block input-0-1606822484000
+20/12/01 17:04:48 INFO PythonStateDStream: Marking RDD 456 for time 1606822488000 ms for checkpointing
+20/12/01 17:04:48 INFO PythonStateDStream: Marking RDD 485 for time 1606822488000 ms for checkpointing
+20/12/01 17:04:48 INFO JobScheduler: Added jobs for time 1606822488000 ms
+20/12/01 17:04:48 INFO JobGenerator: Checkpointing graph for time 1606822488000 ms
+20/12/01 17:04:48 INFO DStreamGraph: Updating checkpoint data for time 1606822488000 ms
+20/12/01 17:04:48 INFO DStreamGraph: Updated checkpoint data for time 1606822488000 ms
+20/12/01 17:04:48 INFO CheckpointWriter: Submitted checkpoint of time 1606822488000 ms to writer queue
+20/12/01 17:04:48 INFO CheckpointWriter: Saving checkpoint for time 1606822488000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822488000'
+20/12/01 17:04:48 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606806128000
+20/12/01 17:04:48 INFO CheckpointWriter: Checkpoint for time 1606822488000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822488000', took 13879 bytes and 55 ms
+20/12/01 17:04:52 INFO MemoryStore: Block input-0-1606822492000 stored as values in memory (estimated size 189.4 KiB, free 408.9 MiB)
+20/12/01 17:04:52 INFO BlockManagerInfo: Added input-0-1606822492000 in memory on 10.0.2.15:44367 (size: 189.4 KiB, free: 409.9 MiB)
+20/12/01 17:04:52 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:52 WARN BlockManager: Block input-0-1606822492000 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:52 INFO BlockGenerator: Pushed block input-0-1606822492000
+20/12/01 17:04:52 INFO MemoryStore: Block input-0-1606822492200 stored as values in memory (estimated size 317.8 KiB, free 408.6 MiB)
+20/12/01 17:04:52 INFO BlockManagerInfo: Added input-0-1606822492200 in memory on 10.0.2.15:44367 (size: 317.8 KiB, free: 409.6 MiB)
+20/12/01 17:04:52 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:04:52 WARN BlockManager: Block input-0-1606822492200 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:04:52 INFO BlockGenerator: Pushed block input-0-1606822492200
+20/12/01 17:04:56 INFO JobScheduler: Added jobs for time 1606822496000 ms
+20/12/01 17:04:56 INFO JobGenerator: Checkpointing graph for time 1606822496000 ms
+20/12/01 17:04:56 INFO DStreamGraph: Updating checkpoint data for time 1606822496000 ms
+20/12/01 17:04:56 INFO DStreamGraph: Updated checkpoint data for time 1606822496000 ms
+20/12/01 17:04:56 INFO CheckpointWriter: Submitted checkpoint of time 1606822496000 ms to writer queue
+20/12/01 17:04:56 INFO CheckpointWriter: Saving checkpoint for time 1606822496000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822496000'
+20/12/01 17:04:56 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606806136000
+20/12/01 17:04:56 INFO CheckpointWriter: Checkpoint for time 1606822496000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822496000', took 13883 bytes and 38 ms
+20/12/01 17:05:00 INFO MemoryStore: Block input-0-1606822500200 stored as values in memory (estimated size 461.6 KiB, free 408.1 MiB)
+20/12/01 17:05:00 INFO BlockManagerInfo: Added input-0-1606822500200 in memory on 10.0.2.15:44367 (size: 461.6 KiB, free: 409.1 MiB)
+20/12/01 17:05:00 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:05:00 WARN BlockManager: Block input-0-1606822500200 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:05:00 INFO BlockGenerator: Pushed block input-0-1606822500200
+20/12/01 17:05:04 INFO PythonStateDStream: Marking RDD 576 for time 1606822504000 ms for checkpointing
+20/12/01 17:05:04 INFO PythonStateDStream: Marking RDD 605 for time 1606822504000 ms for checkpointing
+20/12/01 17:05:04 INFO JobScheduler: Added jobs for time 1606822504000 ms
+20/12/01 17:05:04 INFO JobGenerator: Checkpointing graph for time 1606822504000 ms
+20/12/01 17:05:04 INFO DStreamGraph: Updating checkpoint data for time 1606822504000 ms
+20/12/01 17:05:04 INFO DStreamGraph: Updated checkpoint data for time 1606822504000 ms
+20/12/01 17:05:05 INFO CheckpointWriter: Submitted checkpoint of time 1606822504000 ms to writer queue
+20/12/01 17:05:05 INFO CheckpointWriter: Saving checkpoint for time 1606822504000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822504000'
+20/12/01 17:05:05 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606806144000
+20/12/01 17:05:05 INFO CheckpointWriter: Checkpoint for time 1606822504000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822504000', took 13887 bytes and 48 ms
+20/12/01 17:05:08 INFO MemoryStore: Block input-0-1606822508400 stored as values in memory (estimated size 443.0 KiB, free 407.7 MiB)
+20/12/01 17:05:08 INFO BlockManagerInfo: Added input-0-1606822508400 in memory on 10.0.2.15:44367 (size: 443.0 KiB, free: 408.7 MiB)
+20/12/01 17:05:08 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:05:08 WARN BlockManager: Block input-0-1606822508400 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:05:08 INFO BlockGenerator: Pushed block input-0-1606822508400
+20/12/01 17:05:12 INFO BlockManagerInfo: Removed broadcast_0_piece0 on 10.0.2.15:44367 in memory (size: 27.4 KiB, free: 408.7 MiB)
+20/12/01 17:05:12 INFO BlockManagerInfo: Removed broadcast_3_piece0 on 10.0.2.15:44367 in memory (size: 27.4 KiB, free: 408.7 MiB)
+20/12/01 17:05:12 INFO BlockManagerInfo: Removed broadcast_4_piece0 on 10.0.2.15:44367 in memory (size: 7.0 KiB, free: 408.8 MiB)
+20/12/01 17:05:12 INFO BlockManagerInfo: Removed broadcast_1_piece0 on 10.0.2.15:44367 in memory (size: 5.3 KiB, free: 408.8 MiB)
+20/12/01 17:05:12 INFO BlockManagerInfo: Removed broadcast_2_piece0 on 10.0.2.15:44367 in memory (size: 27.4 KiB, free: 408.8 MiB)
+20/12/01 17:05:13 INFO JobScheduler: Added jobs for time 1606822512000 ms
+20/12/01 17:05:13 INFO JobGenerator: Checkpointing graph for time 1606822512000 ms
+20/12/01 17:05:13 INFO DStreamGraph: Updating checkpoint data for time 1606822512000 ms
+20/12/01 17:05:13 INFO DStreamGraph: Updated checkpoint data for time 1606822512000 ms
+20/12/01 17:05:13 INFO CheckpointWriter: Submitted checkpoint of time 1606822512000 ms to writer queue
+20/12/01 17:05:13 INFO CheckpointWriter: Saving checkpoint for time 1606822512000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822512000'
+20/12/01 17:05:13 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822432000
+20/12/01 17:05:13 INFO CheckpointWriter: Checkpoint for time 1606822512000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822512000', took 13890 bytes and 46 ms
+20/12/01 17:05:16 INFO MemoryStore: Block input-0-1606822516400 stored as values in memory (estimated size 199.8 KiB, free 408.5 MiB)
+20/12/01 17:05:16 INFO BlockManagerInfo: Added input-0-1606822516400 in memory on 10.0.2.15:44367 (size: 199.8 KiB, free: 408.6 MiB)
+20/12/01 17:05:16 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:05:16 WARN BlockManager: Block input-0-1606822516400 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:05:16 INFO BlockGenerator: Pushed block input-0-1606822516400
+20/12/01 17:05:16 INFO MemoryStore: Block input-0-1606822516600 stored as values in memory (estimated size 205.0 KiB, free 408.3 MiB)
+20/12/01 17:05:16 INFO BlockManagerInfo: Added input-0-1606822516600 in memory on 10.0.2.15:44367 (size: 205.0 KiB, free: 408.4 MiB)
+20/12/01 17:05:16 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:05:16 WARN BlockManager: Block input-0-1606822516600 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:05:16 INFO BlockGenerator: Pushed block input-0-1606822516600
+20/12/01 17:05:20 INFO PythonStateDStream: Marking RDD 696 for time 1606822520000 ms for checkpointing
+20/12/01 17:05:20 INFO PythonStateDStream: Marking RDD 725 for time 1606822520000 ms for checkpointing
+20/12/01 17:05:20 INFO JobScheduler: Added jobs for time 1606822520000 ms
+20/12/01 17:05:20 INFO JobGenerator: Checkpointing graph for time 1606822520000 ms
+20/12/01 17:05:20 INFO DStreamGraph: Updating checkpoint data for time 1606822520000 ms
+20/12/01 17:05:20 INFO DStreamGraph: Updated checkpoint data for time 1606822520000 ms
+20/12/01 17:05:20 INFO CheckpointWriter: Submitted checkpoint of time 1606822520000 ms to writer queue
+20/12/01 17:05:20 INFO CheckpointWriter: Saving checkpoint for time 1606822520000 ms to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822520000'
+20/12/01 17:05:20 INFO CheckpointWriter: Deleting file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822440000
+20/12/01 17:05:20 INFO CheckpointWriter: Checkpoint for time 1606822520000 ms saved to file 'file:/usr/local/spark-3.0.1-bin-hadoop3.2/checkpoint_FPL/checkpoint-1606822520000', took 13895 bytes and 65 ms
+20/12/01 17:05:24 INFO MemoryStore: Block input-0-1606822524600 stored as values in memory (estimated size 471.1 KiB, free 407.8 MiB)
+20/12/01 17:05:24 INFO BlockManagerInfo: Added input-0-1606822524600 in memory on 10.0.2.15:44367 (size: 471.1 KiB, free: 407.9 MiB)
+20/12/01 17:05:24 WARN RandomBlockReplicationPolicy: Expecting 1 replicas with only 0 peer/s.
+20/12/01 17:05:24 WARN BlockManager: Block input-0-1606822524600 replicated to only 0 peer(s) instead of 1 peers
+20/12/01 17:05:24 INFO BlockGenerator: Pushed block input-0-1606822524600
+20/12/01 17:05:26 INFO ReceiverSupervisorImpl: Received stop signal
+20/12/01 17:05:26 INFO ReceiverSupervisorImpl: Stopping receiver with message: Stopped by driver: 
+20/12/01 17:05:26 INFO ReceiverTracker: Sent stop signal to all 1 receivers
+20/12/01 17:05:26 WARN SocketReceiver: Error receiving data
+java.net.SocketException: Socket closed
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+	at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+	at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+	at java.io.InputStreamReader.read(InputStreamReader.java:184)
+	at java.io.BufferedReader.fill(BufferedReader.java:161)
+	at java.io.BufferedReader.readLine(BufferedReader.java:324)
+	at java.io.BufferedReader.readLine(BufferedReader.java:389)
+	at org.apache.spark.streaming.dstream.SocketReceiver$$anon$2.getNext(SocketInputDStream.scala:121)
+	at org.apache.spark.streaming.dstream.SocketReceiver$$anon$2.getNext(SocketInputDStream.scala:119)
+	at org.apache.spark.util.NextIterator.hasNext(NextIterator.scala:73)
+	at org.apache.spark.streaming.dstream.SocketReceiver.receive(SocketInputDStream.scala:91)
+	at org.apache.spark.streaming.dstream.SocketReceiver$$anon$1.run(SocketInputDStream.scala:72)
+20/12/01 17:05:26 INFO SocketReceiver: Closed socket to localhost:6100
+20/12/01 17:05:26 INFO ReceiverSupervisorImpl: Called receiver onStop
+20/12/01 17:05:26 INFO ReceiverSupervisorImpl: Deregistering receiver 0
+20/12/01 17:05:26 ERROR ReceiverTracker: Deregistered receiver for stream 0: Stopped by driver
+20/12/01 17:05:26 INFO ReceiverSupervisorImpl: Stopped receiver 0
+20/12/01 17:05:26 WARN ReceiverSupervisorImpl: Restarting receiver with delay 2000 ms: Error receiving data
+java.net.SocketException: Socket closed
+	at java.net.SocketInputStream.socketRead0(Native Method)
+	at java.net.SocketInputStream.socketRead(SocketInputStream.java:116)
+	at java.net.SocketInputStream.read(SocketInputStream.java:171)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+	at sun.nio.cs.StreamDecoder.readBytes(StreamDecoder.java:284)
+	at sun.nio.cs.StreamDecoder.implRead(StreamDecoder.java:326)
+	at sun.nio.cs.StreamDecoder.read(StreamDecoder.java:178)
+	at java.io.InputStreamReader.read(InputStreamReader.java:184)
+	at java.io.BufferedReader.fill(BufferedReader.java:161)
+	at java.io.BufferedReader.readLine(BufferedReader.java:324)
+	at java.io.BufferedReader.readLine(BufferedReader.java:389)
+	at org.apache.spark.streaming.dstream.SocketReceiver$$anon$2.getNext(SocketInputDStream.scala:121)
+	at org.apache.spark.streaming.dstream.SocketReceiver$$anon$2.getNext(SocketInputDStream.scala:119)
+	at org.apache.spark.util.NextIterator.hasNext(NextIterator.scala:73)
+	at org.apache.spark.streaming.dstream.SocketReceiver.receive(SocketInputDStream.scala:91)
+	at org.apache.spark.streaming.dstream.SocketReceiver$$anon$1.run(SocketInputDStream.scala:72)
+20/12/01 17:05:26 INFO BlockGenerator: Stopping BlockGenerator
+20/12/01 17:05:26 INFO ReceiverSupervisorImpl: Stopping receiver with message: Restarting receiver with delay 2000ms: Error receiving data: java.net.SocketException: Socket closed
+20/12/01 17:05:26 WARN ReceiverSupervisorImpl: Receiver has been stopped
+20/12/01 17:05:27 INFO RecurringTimer: Stopped timer for BlockGenerator after time 1606822527200
+20/12/01 17:05:27 INFO BlockGenerator: Waiting for block pushing thread to terminate
+20/12/01 17:05:27 INFO BlockGenerator: Pushing out the last 0 blocks
+20/12/01 17:05:27 INFO BlockGenerator: Stopped block pushing thread
+20/12/01 17:05:27 INFO BlockGenerator: Stopped BlockGenerator
+Exception in thread "receiver-supervisor-future-0" java.lang.Error: java.lang.InterruptedException: sleep interrupted
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1155)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.lang.InterruptedException: sleep interrupted
+	at java.lang.Thread.sleep(Native Method)
+	at org.apache.spark.streaming.receiver.ReceiverSupervisor.$anonfun$restartReceiver$1(ReceiverSupervisor.scala:196)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:659)
+	at scala.util.Success.$anonfun$map$1(Try.scala:255)
+	at scala.util.Success.map(Try.scala:213)
+	at scala.concurrent.Future.$anonfun$map$1(Future.scala:292)
+	at scala.concurrent.impl.Promise.liftedTree1$1(Promise.scala:33)
+	at scala.concurrent.impl.Promise.$anonfun$transform$1(Promise.scala:33)
+	at scala.concurrent.impl.CallbackRunnable.run(Promise.scala:64)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	... 2 more
+20/12/01 17:05:27 INFO ReceiverSupervisorImpl: Stopped receiver without error
+20/12/01 17:05:27 INFO Executor: Finished task 0.0 in stage 2.0 (TID 2). 923 bytes result sent to driver
+20/12/01 17:05:27 INFO TaskSetManager: Starting task 0.0 in stage 3.0 (TID 3, 10.0.2.15, executor driver, partition 0, PROCESS_LOCAL, 7266 bytes)
+20/12/01 17:05:27 INFO TaskSetManager: Finished task 0.0 in stage 2.0 (TID 2) in 100503 ms on 10.0.2.15 (executor driver) (1/1)
+20/12/01 17:05:27 INFO DAGScheduler: ResultStage 2 (start at NativeMethodAccessorImpl.java:0) finished in 100.638 s
+20/12/01 17:05:27 INFO DAGScheduler: Job 2 is finished. Cancelling potential speculative or zombie tasks for this job
+20/12/01 17:05:27 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool 
+20/12/01 17:05:27 INFO Executor: Running task 0.0 in stage 3.0 (TID 3)
+20/12/01 17:05:27 INFO TaskSchedulerImpl: Killing all running tasks in stage 2: Stage finished
+20/12/01 17:05:27 INFO ReceiverTracker: All of the receivers have deregistered successfully
+20/12/01 17:05:27 INFO BatchedWriteAheadLog: BatchedWriteAheadLog shutting down at time: 1606822527278.
+20/12/01 17:05:27 WARN BatchedWriteAheadLog: BatchedWriteAheadLog Writer queue interrupted.
+20/12/01 17:05:27 INFO BatchedWriteAheadLog: BatchedWriteAheadLog Writer thread exiting.
+20/12/01 17:05:27 INFO FileBasedWriteAheadLog_ReceivedBlockTracker: Stopped write ahead log manager
+20/12/01 17:05:27 INFO ReceiverTracker: ReceiverTracker stopped
+20/12/01 17:05:27 INFO JobGenerator: Stopping JobGenerator immediately
+20/12/01 17:05:27 INFO RecurringTimer: Stopped timer for JobGenerator after time 1606822520000
+20/12/01 17:05:27 INFO CheckpointWriter: CheckpointWriter executor terminated? true, waited for 2 ms.
+20/12/01 17:05:27 INFO JobGenerator: Stopped JobGenerator
+20/12/01 17:05:27 INFO BlockManager: Found block input-0-1606822427200 locally
+20/12/01 17:05:28 INFO PythonRunner: Times: total = 998, boot = 849, init = 57, finish = 92
+20/12/01 17:05:28 INFO PythonRunner: Times: total = 147, boot = 43, init = 104, finish = 0
+20/12/01 17:05:28 INFO Executor: Finished task 0.0 in stage 3.0 (TID 3). 1565 bytes result sent to driver
+20/12/01 17:05:28 INFO TaskSetManager: Finished task 0.0 in stage 3.0 (TID 3) in 1202 ms on 10.0.2.15 (executor driver) (1/1)
+20/12/01 17:05:28 INFO PythonAccumulatorV2: Connected to AccumulatorServer at host: 127.0.0.1 port: 44429
+20/12/01 17:05:28 INFO TaskSchedulerImpl: Removed TaskSet 3.0, whose tasks have all completed, from pool 
+20/12/01 17:05:28 INFO DAGScheduler: ResultStage 3 (runJob at PythonRDD.scala:154) finished in 94.950 s
+20/12/01 17:05:28 INFO DAGScheduler: Job 3 is finished. Cancelling potential speculative or zombie tasks for this job
+20/12/01 17:05:28 INFO TaskSchedulerImpl: Killing all running tasks in stage 3: Stage finished
+20/12/01 17:05:28 INFO DAGScheduler: Job 3 finished: runJob at PythonRDD.scala:154, took 94.997257 s
+-------------------------------------------
+Time: 2020-12-01 17:03:52
+-------------------------------------------
+(1609, '2017-08-11')
+(1631, '2017-08-11')
+
+20/12/01 17:05:28 INFO JobScheduler: Finished job streaming job 1606822432000 ms.0 from job set of time 1606822432000 ms
+20/12/01 17:05:28 INFO JobScheduler: Starting job streaming job 1606822432000 ms.1 from job set of time 1606822432000 ms
+20/12/01 17:05:28 INFO SparkContext: Starting job: runJob at PythonRDD.scala:154
+20/12/01 17:05:28 INFO DAGScheduler: Registering RDD 24 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) as input to shuffle 5
+20/12/01 17:05:28 INFO DAGScheduler: Registering RDD 32 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) as input to shuffle 4
+20/12/01 17:05:28 INFO DAGScheduler: Registering RDD 38 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) as input to shuffle 3
+20/12/01 17:05:28 INFO DAGScheduler: Registering RDD 46 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) as input to shuffle 2
+20/12/01 17:05:28 INFO DAGScheduler: Registering RDD 55 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) as input to shuffle 1
+20/12/01 17:05:28 INFO DAGScheduler: Registering RDD 61 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) as input to shuffle 0
+20/12/01 17:05:28 INFO DAGScheduler: Got job 4 (runJob at PythonRDD.scala:154) with 1 output partitions
+20/12/01 17:05:28 INFO DAGScheduler: Final stage: ResultStage 10 (runJob at PythonRDD.scala:154)
+20/12/01 17:05:28 INFO DAGScheduler: Parents of final stage: List(ShuffleMapStage 9)
+20/12/01 17:05:28 INFO DAGScheduler: Missing parents: List(ShuffleMapStage 9)
+20/12/01 17:05:28 INFO DAGScheduler: Submitting ShuffleMapStage 4 (PairwiseRDD[24] at call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442), which has no missing parents
+20/12/01 17:05:28 INFO MemoryStore: Block broadcast_8 stored as values in memory (estimated size 11.1 KiB, free 407.8 MiB)
+20/12/01 17:05:28 INFO MemoryStore: Block broadcast_8_piece0 stored as bytes in memory (estimated size 6.9 KiB, free 407.8 MiB)
+20/12/01 17:05:28 INFO BlockManagerInfo: Added broadcast_8_piece0 in memory on 10.0.2.15:44367 (size: 6.9 KiB, free: 407.9 MiB)
+20/12/01 17:05:28 INFO SparkContext: Created broadcast 8 from broadcast at DAGScheduler.scala:1223
+20/12/01 17:05:28 INFO DAGScheduler: Submitting 1 missing tasks from ShuffleMapStage 4 (PairwiseRDD[24] at call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) (first 15 tasks are for partitions Vector(0))
+20/12/01 17:05:28 INFO TaskSchedulerImpl: Adding task set 4.0 with 1 tasks
+20/12/01 17:05:28 INFO TaskSetManager: Starting task 0.0 in stage 4.0 (TID 4, 10.0.2.15, executor driver, partition 0, PROCESS_LOCAL, 7255 bytes)
+20/12/01 17:05:28 INFO Executor: Running task 0.0 in stage 4.0 (TID 4)
+20/12/01 17:05:28 INFO BlockManager: Found block input-0-1606822427200 locally
+20/12/01 17:05:29 INFO JobScheduler: Stopped JobScheduler
+20/12/01 17:05:29 INFO StreamingContext: StreamingContext stopped successfully
+20/12/01 17:05:29 INFO SparkUI: Stopped Spark web UI at http://10.0.2.15:4040
+20/12/01 17:05:29 INFO DAGScheduler: Job 4 failed: runJob at PythonRDD.scala:154, took 0.889128 s
+20/12/01 17:05:29 INFO DAGScheduler: ShuffleMapStage 4 (call at /usr/local/spark-3.0.1-bin-hadoop3.2/python/lib/py4j-0.10.9-src.zip/py4j/java_gateway.py:2442) failed in 0.802 s due to Stage cancelled because SparkContext was shut down
+20/12/01 17:05:29 INFO MapOutputTrackerMasterEndpoint: MapOutputTrackerMasterEndpoint stopped!
+20/12/01 17:05:29 INFO MemoryStore: MemoryStore cleared
+20/12/01 17:05:29 INFO BlockManager: BlockManager stopped
+20/12/01 17:05:29 INFO BlockManagerMaster: BlockManagerMaster stopped
+20/12/01 17:05:29 INFO OutputCommitCoordinator$OutputCommitCoordinatorEndpoint: OutputCommitCoordinator stopped!
+20/12/01 17:05:29 INFO SparkContext: Successfully stopped SparkContext
+20/12/01 17:05:29 INFO SparkContext: SparkContext already stopped.
+20/12/01 17:05:30 INFO ShutdownHookManager: Shutdown hook called
+20/12/01 17:05:30 INFO ShutdownHookManager: Deleting directory /tmp/spark-c66fa9a3-35f9-449a-879d-39a3be0b8a67
+20/12/01 17:05:30 INFO ShutdownHookManager: Deleting directory /tmp/spark-c66fa9a3-35f9-449a-879d-39a3be0b8a67/pyspark-c8d076b8-e953-4cc7-953c-e6647db04143
+20/12/01 17:05:30 INFO ShutdownHookManager: Deleting directory /tmp/spark-87f69602-1a58-47eb-876d-47955b212b04
