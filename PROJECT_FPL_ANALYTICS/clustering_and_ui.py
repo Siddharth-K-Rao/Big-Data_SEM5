@@ -215,7 +215,16 @@ def query(s):
             out['own_goals'] = player_profile.filter(player_profile.Id==player_id).select("own_goals").collect()[0][0]
             out['percentage_pass_accuracy'] = round(((int(player_profile.filter(player_profile.Id==player_id).select("pass1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("pass2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("pass3").collect()[0][0])+0.00001))*100,2)
             out['percent_shots_on_target'] = round(((int(player_profile.filter(player_profile.Id==player_id).select("st1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("st2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("st3").collect()[0][0])+0.00001))*100,2)
-            
+            if not(out['percentage_pass_accuaracy']):
+                out['percentage_pass_accuaracy']=0
+            if not(out['percent_shots_on_target']):
+                out['percent_shots_on_target']=0
+            if not(out['goals']):
+                out['goals']=0
+            if not(out['own_goals']):
+                out['own_goals']=0
+            if not(out['fouls']):
+                out['fouls']=0
             return json.dumps(out,indent=2)
             
     else:#match info needs to be returned
@@ -232,3 +241,10 @@ def query(s):
 s1 = '''{"req_type": 2,"name": "Rob Holding"}'''
 s2 = '''{"date":"2017-08-11","label":"Arsenal - Leicester City, 4 - 3"}'''
 print(query(s1))
+while(True):
+    location=input("Location of json file")
+    f=open("location","r")
+    k=query(f.readlines())
+    output_location=input("Output Location")
+    with open(output_location,"w") as f:
+        f.write(k)
