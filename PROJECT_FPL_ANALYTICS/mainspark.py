@@ -390,14 +390,20 @@ particular_rate_change=particular_match_change.map(lambda x:str((x[0],x[1][0])).
 #particular_rate_change.pprint()
 
 #id,date,rating
-rate_date_change=rate_date_change.map(lambda x:str((x[0],x[1][1][0],x[1][1][1])))
+def cal_karo_ji(lines):
+    for i in lines[1]:
+        tup=i[0]
+        yield(str(lines[0])+","+tup[0]+","+str(tup[1]))
+
+rate_date_change=rate_date_change.flatMap(cal_karo_ji)
 rate_date_change.pprint()
 
-#allmatches1.saveAsTextFiles("file:///home/revanth/Desktop/FPL/matchdata/matchinfo","txt")
-#chem_coeff.saveAsTextFiles("file:///home/revanth/Desktop/FPL/chem/chemdata","txt")
-#allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerdata/playerinfo","txt")
-#particular_rate_change.saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerrank/rating","txt")
-#rate_date_change.saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerreg/players","txt")
+allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/matchdata/matchinfo","txt")
+chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/chem/chemdata","txt")
+allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerdata/playerinfo","txt")
+particular_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerrank/rating","txt")
+rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerreg/players","txt")
+
 ssc.start()
 ssc.awaitTermination(20)#giving some extra time for computations
 ssc.stop()

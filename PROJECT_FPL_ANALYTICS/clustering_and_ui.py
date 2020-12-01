@@ -9,12 +9,16 @@ from datetime import date
 from pyspark import SparkContext,SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
+from pyspark.sql.types import StructField,StructType,StringType,IntegerType,FloatType
+
 
 spark = SparkSession.builder.appName("FPL_ui").getOrCreate()
 sc = spark.sparkContext
 sqlContext = SQLContext(sc)
 import json
 
+
+ratings_di={}
 
 #player_profile -> dataframe
 def cluster(player_profile):
@@ -38,20 +42,29 @@ def cluster(player_profile):
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
     #chemistry=df_pred.groupby('prediction').agg({'chem_coeff':'mean'}).withColumnRenamed('avg(chem_coeff)','avg_chem_coeff').select("prediction","avg_chem_coeff")
 
-    ratings_di={}
+    
     chemistry_di={}
-
+    print(ratings_di)
     for i in ratings.collect():
-	    ratings_di[i._getitem('prediction')] = i.getitem_('avg_player_rating')
+	    ratings_di[i.getitem('prediction')] = i.getitem('avg_player_rating')
     #for i in chemistry.collect():
-    #    chemistry_di[i._getitem('prediction')] = i.getitem_('avg_chem_coeff')
+    #    chemistry_di[i.getitem('prediction')] = i.getitem('avg_chem_coeff')
+    
     
     #df = df.withColumn("player_rating",when(col("no_of_matches")<5,ratings_di[col("prediction")]).otherwise(col("player_rating")))
-    df_pred = df_pred.withColumn("player_rating",when(df.no_of_matches<5,ratings_di[df_pred.prediction]).otherwise(df_pred.player_rating))
+    #df_pred = df_pred.withColumn("new_player_rating",udf_func(df_pred.prediction))
+    #df_pred = df_pred.withColumn("new_player_rating",df_pred.player_rating)
+    
+    df_pred = df_pred.withColumn("player_rating",when(df.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
     
     #df.withColumn("chem_coeff",when(col("no_of_matches")<5,ratings_di[col("prediction")]).otherwise(col("chem_coeff")))
-    return df
+    print(df_pred.show())
+    return df_pred
 	 
+def new_rating(x):
+    return ratings_di[x]
+    
+udf_func = udf(new_rating,StringType())    	 	 
 
 def date_diff(d1,d2):
 	x = d1.split("-")
@@ -96,19 +109,42 @@ def quad_regression(player_data,match_date):
 	new_rating = test3.select("prediction").collect()[0]
 	return new_rating
 
-	
+
+def get_chemistry(id1,id2):
+    key = str(id1)+";"+str(id2)
+    return chem.filter(chem.key == key).select("chemistry_coeff").collect()[0][0]
+
+chemi=[StructField('key',StringType(),False),StructField('chemistry_coeff',StringType(),False)]
+chem_struct=StructType(fields=chemi)
+
+player=[StructField("Id",StringType(),False),StructField("fouls",StringType(),False),\
+    StructField("goals",StringType(),False),StructField("own_goals",StringType(),False),\
+        StructField("pass1",StringType(),False),StructField("pass2",StringType(),False),StructField("pass3",StringType(),False),\
+            StructField("st1",StringType(),False),StructField("st2",StringType(),False),StructField("st3",StringType(),False)]
+player_struct=StructType(fields=player)
+
+idr=[StructField('Id',StringType(),False),StructField('player_rating',StringType(),False)]
+idstruct=StructType(fields=idr)
+
+players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)
+player_profile = spark.read.csv("/home/revanth/Desktop/FPL/playerdata/part-00000",schema=player_struct,header=False)
+id_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerrank/part-00000",schema=idstruct,header=False)
+player_profile = players_csv.join(player_profile,['Id'])
+player_profile = player_profile.join(id_rating,['Id'])
+#player_profile = cluster(player_profile)
+chem_coeffs= spark.read.csv("/home/revanth/Desktop/FPL/chem/part-00000",schema=chem_struct,header=False)
+#match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/match_data/part-00001")
+
+'''
 players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)
 player_profile = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/part-00000",header=True)
 id_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerrank/part-00000",header=True)
 player_profile = players_csv.join(player_profile,['Id'])
 player_profile = player_profile.join(id_rating,['Id'])
-player_profile = cluster(player_profile)
-
+#player_profile = cluster(player_profile)
 #match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/match_data/part-00001")
-
-
-
-
+chem = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/chem/part-00000",header=True)
+'''
 
 #team1 and team2 are a list of players id in team 1 and team 2, 
 #chemistry -> dict of dict -> {player1:{player2:chemistry,player3:chemistry},....}
@@ -136,12 +172,13 @@ def winning_chance(player_profile,chemistry,team1,team2,match_date):
         for j in team1:
             if(i!=j):
                 try:
-                    avg_chem+=chemistry[i][j]
+                    #avg_chem+=chemistry[i][j]
+                	avg_chem += get_chemistry(i,j)
                 except:
                     avg_chem+=0.5
 
         avg_chem = avg_chem/10
-        play_rating = player_profile.filter(player_profile.Id == i).collect()[0]._getitem_('player_rating')
+        play_rating = player_profile.filter(player_profile.Id == i).collect()[0].getitem('player_rating')
         #use regression to compute actual rating
         #player_data = player_date_rating.filter(player_date_rating.Id == i)
         #play_rating = regression(player_data,match_date)
@@ -160,7 +197,7 @@ def winning_chance(player_profile,chemistry,team1,team2,match_date):
                 except:
                     avg_chem+=0.5
         avg_chem = avg_chem/10
-        player_strength = avg_chem*player_profile.filter(player_profile.Id == i).collect()[0]._getitem_('player_rating')
+        player_strength = avg_chem*player_profile.filter(player_profile.Id == i).collect()[0].getitem('player_rating')
         strength_b += player_strength
     strength_b = strength_b/11
     
@@ -200,7 +237,14 @@ def query(s):
             
         elif d['req_type'] == 2:
             name = d['name']
-            player_id = player_profile.filter(player_profile.name == name).select("Id").collect()[0][0]
+            try:
+                player_id = player_profile.filter(player_profile.name == name).select("Id").collect()[0][0]
+            except:
+                return json.dumps({"error":"Invalid Player"})
+            try:
+                player_profile.filter(player_profile.Id==player_id).select("fouls").collect()[0][0]
+            except:
+                return json.dumps({"error":"Invalid Player"})
             out = {}
             out['name'] = name
             out['birthArea'] = player_profile.filter(player_profile.Id==player_id).select("birthArea").collect()[0][0]
@@ -213,18 +257,10 @@ def query(s):
             out['fouls'] = player_profile.filter(player_profile.Id==player_id).select("fouls").collect()[0][0]
             out['goals'] = player_profile.filter(player_profile.Id==player_id).select("goals").collect()[0][0]
             out['own_goals'] = player_profile.filter(player_profile.Id==player_id).select("own_goals").collect()[0][0]
-            out['percentage_pass_accuracy'] = round(((int(player_profile.filter(player_profile.Id==player_id).select("pass1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("pass2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("pass3").collect()[0][0])+0.00001))*100,2)
-            out['percent_shots_on_target'] = round(((int(player_profile.filter(player_profile.Id==player_id).select("st1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("st2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("st3").collect()[0][0])+0.00001))*100,2)
-            if not(out['percentage_pass_accuaracy']):
-                out['percentage_pass_accuaracy']=0
-            if not(out['percent_shots_on_target']):
-                out['percent_shots_on_target']=0
-            if not(out['goals']):
-                out['goals']=0
-            if not(out['own_goals']):
-                out['own_goals']=0
-            if not(out['fouls']):
-                out['fouls']=0
+            
+            out['percentage_pass_accuracy'] = ((int(player_profile.filter(player_profile.Id==player_id).select("pass1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("pass2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("pass3").collect()[0][0])+0.00001))*100
+            out['percent_shots_on_target'] = ((int(player_profile.filter(player_profile.Id==player_id).select("st1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("st2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("st3").collect()[0][0])+0.00001))*100
+            
             return json.dumps(out,indent=2)
             
     else:#match info needs to be returned
@@ -238,13 +274,11 @@ def query(s):
                 out = json.loads(res)
         return json.dumps(out,indent=2)
        
-s1 = '''{"req_type": 2,"name": "Rob Holding"}'''
+s1 = '''{"req_type": 2,"name": "Aaron Ramsey"}'''
 s2 = '''{"date":"2017-08-11","label":"Arsenal - Leicester City, 4 - 3"}'''
+s3 = '''{"req_type": 1,"date":"2018-10-18",
+"team1":{"name":"RCB","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":""},
+"team2":
+{"name":"MI","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":""}}
+}'''
 print(query(s1))
-while(True):
-    location=input("Location of json file")
-    f=open("location","r")
-    k=query(f.readlines())
-    output_location=input("Output Location")
-    with open(output_location,"w") as f:
-        f.write(k)
