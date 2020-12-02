@@ -51,7 +51,7 @@ def cluster(player_profile):
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
     
     for i in ratings.collect():
-        ratings_di[i._getitem('prediction')] = i.getitem_('avg_player_rating')
+        ratings_di[i.__getitem__('prediction')] = i.__getitem__('avg_player_rating')
 
     df_pred = df_pred.withColumn("player_rating",when(df_pred.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
     
