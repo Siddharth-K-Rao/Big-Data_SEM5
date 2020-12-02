@@ -406,7 +406,7 @@ particular_rate_change.repartition(1).saveAsTextFiles("file:///home/sreyans/Desk
 rate_date_change.repartition(1).saveAsTextFiles("file:///home/sreyans/Desktop/FPL/playerreg/players","txt")
 
 ssc.start()
-ssc.awaitTermination(205)#giving some extra time for computations
+ssc.awaitTermination(20)#giving some extra time for computations
 ssc.stop()
 
 '''

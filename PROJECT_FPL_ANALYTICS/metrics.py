@@ -1,23 +1,23 @@
 #!/usr/bin/python3
-#from pyspark.mllib.clustering import KMeans, KMeansModel
+
 import numpy
 import sys
-from pyspark.ml.clustering import KMeans
+import json
+import datetime as dt
+from pyspark.ml.clustering import KMeans,KMeansModel
 from pyspark.ml.feature import VectorAssembler
 from pyspark.sql import SQLContext
 from pyspark.ml.regression import LinearRegression
-#from pyspark.ml.evaluation import RegressionEvaluator
-from datetime import date
+from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark import SparkContext,SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import StructField,StructType,StringType,IntegerType,FloatType
 
 
-spark = SparkSession.builder.appName("FPL_ui").getOrCreate()
-sc = spark.sparkContext
+spark = SparkSession.builder.appName("FPL_ML").getOrCreate()
+sc=spark.sparkContext
 sqlContext = SQLContext(sc)
-import json
 
 
 ratings_di={}
@@ -27,14 +27,21 @@ def cluster(player_profile):
     df=player_profile
     FEATURES_COL = ['fouls','goals','own_goals','pass1','pass2','pass3','st1','st2','st3']
     for col in df.columns:
-	    if col in FEATURES_COL:
-	        df = df.withColumn(col,df[col].cast('float'))
+        if col in FEATURES_COL:
+            df = df.withColumn(col,df[col].cast('float'))
     df = df.na.drop()
     vecAssembler = VectorAssembler(inputCols=FEATURES_COL, outputCol="features")
     df_kmeans = vecAssembler.transform(df).select('Id', 'features')
     k = 5
-    kmeans = KMeans().setK(k).setSeed(1).setFeaturesCol("features")
-    model = kmeans.fit(df_kmeans)
+    kmeans = KMeans().setK(k).setMaxIter(3).setSeed(1).setFeaturesCol("features")
+    model_path = "/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/"+"kmeans_model"
+    try:
+        model = KMeansModel.load(model_path)
+        #print("loading saved model")
+    except:
+        model = kmeans.fit(df_kmeans)
+        model.save(model_path)
+    
     centers = model.clusterCenters()
     transformed = model.transform(df_kmeans).select('Id', 'prediction')
     rows = transformed.collect()
@@ -42,70 +49,75 @@ def cluster(player_profile):
     df_pred = df_pred.join(df, 'Id')
 
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
-    #chemistry=df_pred.groupby('prediction').agg({'chem_coeff':'mean'}).withColumnRenamed('avg(chem_coeff)','avg_chem_coeff').select("prediction","avg_chem_coeff")
-
     
-    chemistry_di={}
-    print(ratings_di)
     for i in ratings.collect():
-	    ratings_di[i.getitem('prediction')] = i.getitem('avg_player_rating')
-    #for i in chemistry.collect():
-    #    chemistry_di[i.getitem('prediction')] = i.getitem('avg_chem_coeff')
+        ratings_di[i._getitem('prediction')] = i.getitem_('avg_player_rating')
+
+    df_pred = df_pred.withColumn("player_rating",when(df_pred.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
     
     
-    #df = df.withColumn("player_rating",when(col("no_of_matches")<5,ratings_di[col("prediction")]).otherwise(col("player_rating")))
-    #df_pred = df_pred.withColumn("new_player_rating",udf_func(df_pred.prediction))
-    #df_pred = df_pred.withColumn("new_player_rating",df_pred.player_rating)
-    
-    df_pred = df_pred.withColumn("player_rating",when(df.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
-    
-    #df.withColumn("chem_coeff",when(col("no_of_matches")<5,ratings_di[col("prediction")]).otherwise(col("chem_coeff")))
-    print(df_pred.show())
+    #print(df_pred.show())
     return df_pred
+
 	 
 def new_rating(x):
     return ratings_di[x]
     
 udf_func = udf(new_rating,StringType())    	 	 
 
-def date_diff(d1,d2):
-	x = d1.split("-")
-	f_date = date(x[0],x[1],x[2])
-	y = d1.split("-")
-	l_date = date(y[0],y[1],y[2])
-	return l_date-f_date
 
+def date_diff(d1,d2):
+    d1 = dt.datetime.strptime(d1, "%Y-%m-%d")
+    d2 = dt.datetime.strptime(d2, "%Y-%m-%d")
+    diff = (d2 - d1).days
+    return str(diff)
+	
+udf2 = udf(date_diff,StringType())
 
 # player_data -> dataframe with player_rating, date
 # match_date -> to predict the players rating on match_date
 def regression(player_data, match_date):
-	first_date = player_data.select("date").collect()[0]
-	#x = firstdate.split("-")
-	#f_date = date(x[0],x[1],x[2])
-	new_data = player_data.withColumn("date",date_diff(first_date,col("date")))
-	new_data = new_data.withColumnRenamed("date","age")
-	return quad_regression(new_data,match_date)
+    birth_date = player_data.select("date").collect()[0][0]
+    #x = firstdate.split("-")
+    #f_date = date(x[0],x[1],x[2])
+    new_data = player_data.withColumn("birth_date",when(player_data.date != "",str(birth_date)).otherwise(player_data.date))
+    new_data = new_data.withColumn("date",udf2(new_data.birth_date,new_data.date))
+    new_data = new_data.withColumnRenamed("date","age")
+    #print(new_data.show())
+    new_val = quad_regression(new_data,match_date)
+    #print("return in regression",new_val)
+    return new_val
 
 
 def quad_regression(player_data,match_date):
-	first_date = player_data.select("date").collect()[0]
-	age = date_diff(first_date,match_date)
-	age_sq = age*age
-	test = spark.createDataframe([(age,age_sq,0)],['age','age_sq','label'])
+    birth_date = player_data.select("birth_date").collect()[0][0]
+    #print("first",birth_date,"matchdate",match_date,"diff",date_diff(birth_date,match_date))
+    age = int(date_diff(str(birth_date),match_date))
+    age_sq = age*age
+    test = sqlContext.createDataFrame([(age,age_sq,0)],['age','age_sq','label'])
 
-	data2 = player_data.withColumn('age_sq',data.age*data.age)
-	data2 = player_data.select(player_data.age,player_data.age_sq,player_data.player_rating.alias('label'))
-	assembler = VectorAssembler().setInputCols(['age','age_sq']).setOutputCol('features')
-	train = assembler.transform(data2)
-	train2 = train.select("features","label")
+    data2 = player_data.withColumn('age_sq',player_data.age*player_data.age)
+    data2 = data2.select(data2.age,data2.age_sq,data2.player_rating.alias('label'))
 
-	lr = LinearRegression()
-	model = lr.fit(train2)
-	test1 = assembler.transform(test)
-	test2 = test1.select('features')
-	test3 = model.transform(test2)
-	new_rating = test3.select("prediction").collect()[0]
-	return new_rating
+    FEATURES_COL = ['age','age_sq','label']
+    for col in data2.columns:
+        if col in FEATURES_COL:
+            data2 = data2.withColumn(col,data2[col].cast('float'))
+
+
+    assembler = VectorAssembler().setInputCols(['age','age_sq']).setOutputCol('features')
+    train = assembler.transform(data2)
+    train2 = train.select("features","label")
+
+    lr = LinearRegression()
+    model = lr.fit(train2)
+    test1 = assembler.transform(test)
+    test2 = test1.select('features')
+    test3 = model.transform(test2)
+    #print(test3.show())
+    new_rating = test3.select("prediction").collect()[0][0]
+    #print("return in quad_regression",new_rating)
+    return new_rating
 
 
 def get_chemistry(id1,id2):
@@ -124,39 +136,34 @@ chem_struct=StructType(fields=chemi)
 player=[StructField("Id",StringType(),False),StructField("fouls",StringType(),False),\
     StructField("goals",StringType(),False),StructField("own_goals",StringType(),False),\
         StructField("pass1",StringType(),False),StructField("pass2",StringType(),False),StructField("pass3",StringType(),False),\
-            StructField("st1",StringType(),False),StructField("st2",StringType(),False),StructField("st3",StringType(),False)]
+            StructField("st1",StringType(),False),StructField("st2",StringType(),False),StructField("st3",StringType(),False),StructField("no_of_matches",StringType(),False)]
 player_struct=StructType(fields=player)
 
 idr=[StructField('Id',StringType(),False),StructField('player_rating',StringType(),False)]
 idstruct=StructType(fields=idr)
 
+pdr = [StructField('Id',StringType(),False),StructField('date',StringType(),False),StructField('player_rating',StringType(),False)]
+pdrstruct = StructType(fields=pdr)
+
 players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)#player data like name id birthdate...
 player_info = spark.read.csv("/home/revanth/Desktop/FPL/playerdata/playerinfo/part-00000",schema=player_struct,header=False)#has fouls goals etc
 id_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerrank/rating/part-00000",schema=idstruct,header=False)# has Id,player_rating
+chem = spark.read.csv("/home/revanth/Desktop/FPL/chem/chemdata/part-00000",schema=chem_struct,header=False)# player1Id;player2Id,chemistry
+match_data = sc.textFile("/home/revanth/Desktop/FPL/matchdata/matchinfo/part-00000")
+player_date_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerreg/players/part-00000",schema=pdrstruct,header=False)
+
 
 player_info = player_info.join(id_rating,['Id']) #has Id,rating,fouls,goals etc
-
 player_profile = players_csv.join(player_info,['Id']) #join of everything
+
 player_profile2 = players_csv.join(player_info,['Id'],how='full')
 player_profile2 = player_profile2.na.fill(value="0")
 player_profile2 = player_profile2.withColumn("player_rating",when(player_profile2.player_rating == "0","0.5").otherwise(player_profile2.player_rating))
-print(player_profile2.show())
-#player_profile = player_profile.join(id_rating,['Id'])
+#print(player_profile2.show())
 
-#player_profile = cluster(player_profile)
-chem= spark.read.csv("/home/revanth/Desktop/FPL/chem/chemdata/part-00000",schema=chem_struct,header=False)
-#match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/match_data/part-00001")
-match_data = sc.textFile("/home/revanth/Desktop/FPL/matchdata/matchinfo/part-00000")
-'''
-players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)
-player_profile = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/part-00000",header=True)
-id_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerrank/part-00000",header=True)
-player_profile = players_csv.join(player_profile,['Id'])
-player_profile = player_profile.join(id_rating,['Id'])
-#player_profile = cluster(player_profile)
-#match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/match_data/part-00001")
-chem = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/chem/part-00000",header=True)
-'''
+
+player_profile = cluster(player_profile)
+
 
 #team1 and team2 are a list of players id in team 1 and team 2, 
 #chemistry -> dict of dict -> {player1:{player2:chemistry,player3:chemistry},....}
@@ -164,22 +171,29 @@ chem = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_A
 #returns (winning chane of team1, winning chance of team2)
 def winning_chance(player_profile,team1,team2,match_date):
     if(len(team1) < 11 or len(team2) < 11):
-        return "Invalid team 1"
+        return "Invalid team"
+    
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
         try:
-            d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
-        except Exception as e:
-            return "Invalid team 2 "+str(e)
+            d[player_profile.filter(player_profile.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+        except:    
+            try:
+                d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+            except Exception as e:
+                return "Invalid team"
     if(d['GK']<1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
         return "Invalid team"
     
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
         try:
-            d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
-        except:
-            return "Invalid team 3"
+            d[player_profile.filter(player_profile.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1            
+        except:    
+            try:
+                d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+            except:
+                return "Invalid team"
     if(d['GK']!=1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
         return "Invalid team"
 
@@ -190,17 +204,22 @@ def winning_chance(player_profile,team1,team2,match_date):
         for j in team1:
             if(i!=j):
                 try:
-                    #avg_chem+=chemistry[i][j]
                 	avg_chem += get_chemistry(i,j)
                 except:
-                    avg_chem+=0.5
+                    avg_chem += 0.5
 
         avg_chem = avg_chem/10
-        play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+        #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
         #use regression to compute actual rating
-        #player_data = player_date_rating.filter(player_date_rating.Id == i)
-        #play_rating = regression(player_data,match_date)
-        print("rating--",play_rating,'avg_chem--',avg_chem)
+        try:
+            player_data = player_date_rating.filter(player_date_rating.Id == i)
+            play_rating = regression(player_data,match_date)
+        except:
+            try:
+                play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+            except:
+                play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')        
+        #print("rating--",play_rating,'avg_chem--',avg_chem)
         player_strength = float(avg_chem)*float(play_rating)
         strength_a += player_strength
     strength_a = strength_a/11
@@ -212,11 +231,20 @@ def winning_chance(player_profile,team1,team2,match_date):
         for j in team2:
             if(i!=j):
                 try:
-                    avg_chem+=chemistry[i][j]
+                    avg_chem += chemistry[i][j]
                 except:
-                    avg_chem+=0.5
+                    avg_chem += 0.5
         avg_chem = avg_chem/10
-        play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+    
+        #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+        try:
+            player_data = player_date_rating.filter(player_date_rating.Id == i)
+            play_rating = regression(player_data,match_date)
+        except:
+            try:
+                play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+            except:
+                play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
         player_strength = float(avg_chem)*float(play_rating)
         strength_b += player_strength
     strength_b = strength_b/11
@@ -245,7 +273,8 @@ def query(s):
                         player_id = players_csv.filter(players_csv.name == d['team1'][i]).select("Id").collect()[0][0]                   
                         team1.append(player_id)
                     except Exception as e:                       
-                        print("hereeee",d['team1'][i],e)
+                        #print("hereeee",d['team1'][i],e)
+                        pass
                 else:
                     n1 = d['team1'][i]
             for i in d['team2']:
@@ -260,7 +289,7 @@ def query(s):
                 out={"error":k}
                 return json.dumps(out,indent=2)
             ch_a,ch_b=k[0],k[1]
-            out = {"team1":{"name":n1,"winning_chance":ch_a},"team2":{"name":n2},"winning_chance":ch_b}
+            out = {"team1":{"name":n1,"winning_chance":ch_a},"team2":{"name":n2,"winning_chance":ch_b}}
             return json.dumps(out,indent=2)
             
         elif d['req_type'] == 2:
@@ -286,8 +315,8 @@ def query(s):
             out['goals'] = player_profile.filter(player_profile.Id==player_id).select("goals").collect()[0][0]
             out['own_goals'] = player_profile.filter(player_profile.Id==player_id).select("own_goals").collect()[0][0]
             
-            out['percentage_pass_accuracy'] = ((int(player_profile.filter(player_profile.Id==player_id).select("pass1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("pass2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("pass3").collect()[0][0])+0.00001))*100
-            out['percent_shots_on_target'] = ((int(player_profile.filter(player_profile.Id==player_id).select("st1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("st2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("st3").collect()[0][0])+0.00001))*100
+            out['percentage_pass_accuracy'] = int(((int(player_profile.filter(player_profile.Id==player_id).select("pass1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("pass2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("pass3").collect()[0][0])+0.00001))*100)
+            out['percent_shots_on_target'] = int(((int(player_profile.filter(player_profile.Id==player_id).select("st1").collect()[0][0])+int(player_profile.filter(player_profile.Id==player_id).select("st2").collect()[0][0]))/(int(player_profile.filter(player_profile.Id==player_id).select("st3").collect()[0][0])+0.00001))*100)
             
             return json.dumps(out,indent=2)
             
@@ -303,53 +332,35 @@ def query(s):
         return json.dumps(out,indent=2)
 
 inpf = open(sys.argv[1],"r")
-playertext=inpf.read()
-ans=query(playertext)
-outf=open(sys.argv[2],"w")
+playertext = inpf.read()
+ans = query(playertext)
+outf = open(sys.argv[2],"w")
 outf.write(ans)
 inpf.close()
 outf.close()
 
-'''
-inp_player = open("inp_player.json","r")
-playertext=inp_player.read()
-ans=query(playertext)
-out_player=open("out_player.json","w")
-out_player.write(ans)
-inp_player.close()
-out_player.close()
-
-inp_match = open("inp_match.json","r")
-matchtext=inp_match.read()
-ans=query(matchtext)
-out_match=open("out_match.json","w")
-out_match.write(ans)
-inp_match.close()
-out_match.close()
-
-inp_pred = open("inp_predict.json","r")
-predtext=inp_pred.read()
-ans=query(predtext)
-out_pred=open("out_predict.json","w")
-out_pred.write(ans)
-inp_pred.close()
-out_pred.close()
-'''
-
-"""       
-s1 = '''{"req_type": 2,"name": "Toby Alderweireld"}'''
+"""   
+s1 = '''{"req_type": 2,"name": "Chris Brunt"}'''
 s2 = '''{"date":"2017-08-11","label":"Arsenal - Leicester City, 4 - 3"}'''
 s3 = '''
 {"req_type": 1,
 "date":"2018-10-18",
-"team3":
-{"name":"RCB","player1":"Toby Alderweireld","player2":"Daley Blind","player3":"Jan Vertonghen","player4":"Christian  Dannemann Eriksen","player5":"Davy Klaassen","player6":"Niki M\u00e4enp\u00e4\u00e4","player7":"Ragnar Klavan","player8":"Johann  Berg Gu\u00f0munds\u00adson","player9":"Erik Pieters","player10":"Georginio Wijnaldum","player11":"J\u00fcrgen Locadia"},
 "team1":
 {"name":"MI","player1":"Erwin Mulder","player2":"Terence Kongolo","player3":"Bruno Martins Indi","player4":"Daryl Janmaat","player5":"Rajiv van La Parra","player6":"Luciano Narsingh","player7":"Nacer Chadli","player8":"Leroy Fer","player9":"Wilfried Guemiand Bony","player10":"Mike van der Hoorn","player11":"Rhu-endly Martina"},
 "team2":
 {"name":"MI","player1":"Erwin Mulder","player2":"Terence Kongolo","player3":"Bruno Martins Indi","player4":"Daryl Janmaat","player5":"Rajiv van La Parra","player6":"Luciano Narsingh","player7":"Nacer Chadli","player8":"Leroy Fer","player9":"Wilfried Guemiand Bony","player10":"Mike van der Hoorn","player11":"Rhu-endly Martina"}
 }'''
+
+s4 = '''
+{"req_type": 1,
+"date":"2018-10-18",
+"team1":
+{"name":"MI","player1":"Olivier Giroud","player2":"Aaron Ramsey","player3":"Rob Holding","player4":"Alex Oxlade-Chamberlain","player5":"Ignacio Monreal Eraso","player6":"Petr \u010cech","player7":"Granit Xhaka","player8":"","player9":"Theo  Walcott","player10":"Mohamed Naser Elsayed Elneny","player11":"Daniel Nii Tackie Mensah Welbeck","player12":"Sead Kola\u0161inac","player13":"Alexandre Lacazette","player14":"H\u00e9ctor Beller\u00edn Moruno","player15":"Mesut \u00d6zil"},
+"team2":
+{"name":"MI","player1":"Kelechi Promise Iheanacho","player2":"Daniel Amartey","player3":"Demarai Gray","player4":"Matty James","player5":"Kasper Schmeichel","player6":"Onyinye Wilfred Ndidi","player7":"Riyad Mahrez","player8":"Shinji Okazaki","player9":"Marc Albrighton","player10":"Harry  Maguire","player11":"Danny Simpson","player12":"Christian Fuchs","player13":"Jamie Vardy"}
+}'''
 """
+
 '''
 Toby Alderweireld
 Daley Blind
@@ -364,7 +375,6 @@ Georginio Wijnaldum
 J\u00fcrgen Locadia
 '''
 
-
 '''
 Erwin Mulder
 Terence Kongolo
@@ -377,15 +387,24 @@ Leroy Fer
 Wilfried Guemiand Bony
 Mike van der Hoorn
 Rhu-endly Martina
-
-
-while(True):
-    inp=input("location of input file")
-    f=open(inp,"r")
-    k=f.readlines()
-    query(k)
-    out=input("location of output file")
-    with open(out,"w") as f:
-        f.write(k)
 '''
 
+
+'''
+f1 = open("input.txt",'r')
+s = f1.read()
+
+output = query(s)
+print(output)
+f2 = open("output.txt",'w')
+f2.write(output)
+
+f1.close()
+f2.close()
+'''
+#for testing regression
+'''
+player_data = player_date_rating.filter(player_date_rating.Id == 7868)
+play_rating = regression(player_data,"2018-10-12")
+print("rreg rateing----",play_rating)
+'''
