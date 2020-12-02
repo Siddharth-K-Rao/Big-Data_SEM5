@@ -12,4 +12,3 @@ for folder in l:
         shutil.rmtree(file_name)
     for file_name in [os.path.join(folder,d) for d in os.listdir(folder)]:
         os.rename(file_name,file_name.split("-")[0])
-
