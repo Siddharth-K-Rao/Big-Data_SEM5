@@ -146,11 +146,11 @@ pdr = [StructField('Id',StringType(),False),StructField('date',StringType(),Fals
 pdrstruct = StructType(fields=pdr)
 
 players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)#player data like name id birthdate...
-player_info = spark.read.csv("/home/revanth/Desktop/FPL/playerdata/playerinfo/part-00000",schema=player_struct,header=False)#has fouls goals etc
-id_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerrank/rating/part-00000",schema=idstruct,header=False)# has Id,player_rating
-chem = spark.read.csv("/home/revanth/Desktop/FPL/chem/chemdata/part-00000",schema=chem_struct,header=False)# player1Id;player2Id,chemistry
-match_data = sc.textFile("/home/revanth/Desktop/FPL/matchdata/matchinfo/part-00000")
-player_date_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerreg/players/part-00000",schema=pdrstruct,header=False)
+player_info = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerdata/playerinfo/part-00000",schema=player_struct,header=False)#has fouls goals etc
+id_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerrank/rating/part-00000",schema=idstruct,header=False)# has Id,player_rating
+chem = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/chem/chemdata/part-00000",schema=chem_struct,header=False)# player1Id;player2Id,chemistry
+match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/matchdata/matchinfo/part-00000")
+player_date_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerreg/players/part-00000",schema=pdrstruct,header=False)
 
 
 player_info = player_info.join(id_rating,['Id']) #has Id,rating,fouls,goals etc
