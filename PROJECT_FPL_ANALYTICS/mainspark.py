@@ -268,7 +268,8 @@ conf.setAppName('BD_FPL_Project')
 spark=SparkSession.builder.appName("FPL_analytics").getOrCreate()
 
 #reading the csv of all players
-playercsvt=spark.read.option('header',True).csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
+#playercsvt=spark.read.option('header',True).csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
+playercsvt=spark.read.option('header',True).csv("/home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
 playercsv=playercsvt.select("Id","name").rdd.collectAsMap()#makes a dictionary of all players
 
 sc = spark.sparkContext
@@ -398,14 +399,14 @@ def cal_karo_ji(lines):
 rate_date_change=rate_date_change.flatMap(cal_karo_ji)
 rate_date_change.pprint()
 
-allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/matchdata/matchinfo","txt")
-chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/chem/chemdata","txt")
-allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerdata/playerinfo","txt")
-particular_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerrank/rating","txt")
-rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerreg/players","txt")
+allmatches1.repartition(1).saveAsTextFiles("file:///home/sreyans/Desktop/FPL/matchdata/matchinfo","txt")
+chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/sreyans/Desktop/FPL/chem/chemdata","txt")
+allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/sreyans/Desktop/FPL/playerdata/playerinfo","txt")
+particular_rate_change.repartition(1).saveAsTextFiles("file:///home/sreyans/Desktop/FPL/playerrank/rating","txt")
+rate_date_change.repartition(1).saveAsTextFiles("file:///home/sreyans/Desktop/FPL/playerreg/players","txt")
 
 ssc.start()
-ssc.awaitTermination(20)#giving some extra time for computations
+ssc.awaitTermination(205)#giving some extra time for computations
 ssc.stop()
 
 '''

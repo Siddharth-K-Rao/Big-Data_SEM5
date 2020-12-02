@@ -1,5 +1,7 @@
+#!/usr/bin/python3
 #from pyspark.mllib.clustering import KMeans, KMeansModel
 import numpy
+import sys
 from pyspark.ml.clustering import KMeans
 from pyspark.ml.feature import VectorAssembler
 from pyspark.sql import SQLContext
@@ -74,10 +76,6 @@ def date_diff(d1,d2):
 	return l_date-f_date
 
 
-def get_chemistry(key):
-    pass
-
-
 # player_data -> dataframe with player_rating, date
 # match_date -> to predict the players rating on match_date
 def regression(player_data, match_date):
@@ -112,7 +110,13 @@ def quad_regression(player_data,match_date):
 
 def get_chemistry(id1,id2):
     key = str(id1)+";"+str(id2)
-    return chem.filter(chem.key == key).select("chemistry_coeff").collect()[0][0]
+    try:
+        chemistry = chem.filter(chem.key == key).select("chemistry_coeff").collect()[0][0]
+        #print(chemistry)
+        #return float(chemistry)
+    except:
+        chemistry = 0.5
+    return float(chemistry)
 
 chemi=[StructField('key',StringType(),False),StructField('chemistry_coeff',StringType(),False)]
 chem_struct=StructType(fields=chemi)
@@ -126,15 +130,23 @@ player_struct=StructType(fields=player)
 idr=[StructField('Id',StringType(),False),StructField('player_rating',StringType(),False)]
 idstruct=StructType(fields=idr)
 
-players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)
-player_profile = spark.read.csv("/home/revanth/Desktop/FPL/playerdata/part-00000",schema=player_struct,header=False)
-id_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerrank/part-00000",schema=idstruct,header=False)
-player_profile = players_csv.join(player_profile,['Id'])
-player_profile = player_profile.join(id_rating,['Id'])
-#player_profile = cluster(player_profile)
-chem_coeffs= spark.read.csv("/home/revanth/Desktop/FPL/chem/part-00000",schema=chem_struct,header=False)
-#match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/match_data/part-00001")
+players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)#player data like name id birthdate...
+player_info = spark.read.csv("/home/revanth/Desktop/FPL/playerdata/playerinfo/part-00000",schema=player_struct,header=False)#has fouls goals etc
+id_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerrank/rating/part-00000",schema=idstruct,header=False)# has Id,player_rating
 
+player_info = player_info.join(id_rating,['Id']) #has Id,rating,fouls,goals etc
+
+player_profile = players_csv.join(player_info,['Id']) #join of everything
+player_profile2 = players_csv.join(player_info,['Id'],how='full')
+player_profile2 = player_profile2.na.fill(value="0")
+player_profile2 = player_profile2.withColumn("player_rating",when(player_profile2.player_rating == "0","0.5").otherwise(player_profile2.player_rating))
+print(player_profile2.show())
+#player_profile = player_profile.join(id_rating,['Id'])
+
+#player_profile = cluster(player_profile)
+chem= spark.read.csv("/home/revanth/Desktop/FPL/chem/chemdata/part-00000",schema=chem_struct,header=False)
+#match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/match_data/part-00001")
+match_data = sc.textFile("/home/revanth/Desktop/FPL/matchdata/matchinfo/part-00000")
 '''
 players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)
 player_profile = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/part-00000",header=True)
@@ -150,19 +162,25 @@ chem = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_A
 #chemistry -> dict of dict -> {player1:{player2:chemistry,player3:chemistry},....}
 #player_profile -> dataframe
 #returns (winning chane of team1, winning chance of team2)
-def winning_chance(player_profile,chemistry,team1,team2,match_date):
+def winning_chance(player_profile,team1,team2,match_date):
     if(len(team1) < 11 or len(team2) < 11):
-        return "Invalid team"
+        return "Invalid team 1"
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
-        d[player_profile.filter(player_profile.Id==i).collect()[0].__getitem('role')]+=1
-    if(d['GK']<1 or d['DF']<3 or d['MF']<2 or d['FW']<1):
+        try:
+            d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+        except Exception as e:
+            return "Invalid team 2 "+str(e)
+    if(d['GK']<1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
         return "Invalid team"
     
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
-        d[player_profile.filter(player_profile.Id==i).collect()[0].__getitem('role')]+=1
-    if(d['GK']<1 or d['DF']<3 or d['MF']<2 or d['FW']<1):
+        try:
+            d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+        except:
+            return "Invalid team 3"
+    if(d['GK']!=1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
         return "Invalid team"
 
     strength_a = 0
@@ -178,11 +196,12 @@ def winning_chance(player_profile,chemistry,team1,team2,match_date):
                     avg_chem+=0.5
 
         avg_chem = avg_chem/10
-        play_rating = player_profile.filter(player_profile.Id == i).collect()[0].getitem('player_rating')
+        play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
         #use regression to compute actual rating
         #player_data = player_date_rating.filter(player_date_rating.Id == i)
         #play_rating = regression(player_data,match_date)
-        player_strength = avg_chem*play_rating
+        print("rating--",play_rating,'avg_chem--',avg_chem)
+        player_strength = float(avg_chem)*float(play_rating)
         strength_a += player_strength
     strength_a = strength_a/11
 
@@ -197,12 +216,13 @@ def winning_chance(player_profile,chemistry,team1,team2,match_date):
                 except:
                     avg_chem+=0.5
         avg_chem = avg_chem/10
-        player_strength = avg_chem*player_profile.filter(player_profile.Id == i).collect()[0].getitem('player_rating')
+        play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+        player_strength = float(avg_chem)*float(play_rating)
         strength_b += player_strength
     strength_b = strength_b/11
     
-    chance_a = (0.5 + strength_a - (strength_a + strength_b)/2)*100
-    chance_b = 100 - chance_b
+    chance_a = int((0.5 + strength_a - (strength_a + strength_b)/2)*100)
+    chance_b = 100 - chance_a
     
     return (chance_a,chance_b)
 
@@ -210,6 +230,7 @@ def winning_chance(player_profile,chemistry,team1,team2,match_date):
 # line -> request in json format
 # returns output json
 def query(s):
+    s = s.replace("\\u","\\\\u")
     d = json.loads(s)
     #d = {'req_type': 2,'name': 'Rob Holding'}
     if 'req_type' in d:
@@ -218,21 +239,28 @@ def query(s):
             team2 = []
             date = d['date']
             for i in d['team1']:
-                if i != 'name':
-                    player_id = player_profile.filter(player_profile.name == d['team1'][i]).select("Id").collect()[0][0]
-                    team1.append(player_id)
+                if i != 'name':               
+                    try:
+                        #player_id = player_profile.filter(player_profile.name == d['team1'][i]).select("Id").collect()[0][0]
+                        player_id = players_csv.filter(players_csv.name == d['team1'][i]).select("Id").collect()[0][0]                   
+                        team1.append(player_id)
+                    except Exception as e:                       
+                        print("hereeee",d['team1'][i],e)
                 else:
                     n1 = d['team1'][i]
             for i in d['team2']:
                 if i != 'name':
-                    player_id = player_profile.filter(player_profile.name == d['team2'][i]).select("Id").collect()[0][0]
-                    team2.append(player_id)#appends name, shd append player id
+                    #player_id = player_profile.filter(player_profile.name == d['team2'][i]).select("Id").collect()[0][0]
+                    player_id = players_csv.filter(players_csv.name == d['team2'][i]).select("Id").collect()[0][0]
+                    team2.append(player_id)
                 else:
                     n2 = d['team2'][i]
-            ch_a,ch_b = winning_chance(player_profile,chemistry,team1,team2,date)
-            
+            k = winning_chance(player_profile,team1,team2,date)
+            if k=="Invalid team":
+                out={"error":k}
+                return json.dumps(out,indent=2)
+            ch_a,ch_b=k[0],k[1]
             out = {"team1":{"name":n1,"winning_chance":ch_a},"team2":{"name":n2},"winning_chance":ch_b}
-            
             return json.dumps(out,indent=2)
             
         elif d['req_type'] == 2:
@@ -273,12 +301,91 @@ def query(s):
                 res = line.split(";")[1]
                 out = json.loads(res)
         return json.dumps(out,indent=2)
-       
-s1 = '''{"req_type": 2,"name": "Aaron Ramsey"}'''
+
+inpf = open(sys.argv[1],"r")
+playertext=inpf.read()
+ans=query(playertext)
+outf=open(sys.argv[2],"w")
+outf.write(ans)
+inpf.close()
+outf.close()
+
+'''
+inp_player = open("inp_player.json","r")
+playertext=inp_player.read()
+ans=query(playertext)
+out_player=open("out_player.json","w")
+out_player.write(ans)
+inp_player.close()
+out_player.close()
+
+inp_match = open("inp_match.json","r")
+matchtext=inp_match.read()
+ans=query(matchtext)
+out_match=open("out_match.json","w")
+out_match.write(ans)
+inp_match.close()
+out_match.close()
+
+inp_pred = open("inp_predict.json","r")
+predtext=inp_pred.read()
+ans=query(predtext)
+out_pred=open("out_predict.json","w")
+out_pred.write(ans)
+inp_pred.close()
+out_pred.close()
+'''
+
+"""       
+s1 = '''{"req_type": 2,"name": "Toby Alderweireld"}'''
 s2 = '''{"date":"2017-08-11","label":"Arsenal - Leicester City, 4 - 3"}'''
-s3 = '''{"req_type": 1,"date":"2018-10-18",
-"team1":{"name":"RCB","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":""},
+s3 = '''
+{"req_type": 1,
+"date":"2018-10-18",
+"team3":
+{"name":"RCB","player1":"Toby Alderweireld","player2":"Daley Blind","player3":"Jan Vertonghen","player4":"Christian  Dannemann Eriksen","player5":"Davy Klaassen","player6":"Niki M\u00e4enp\u00e4\u00e4","player7":"Ragnar Klavan","player8":"Johann  Berg Gu\u00f0munds\u00adson","player9":"Erik Pieters","player10":"Georginio Wijnaldum","player11":"J\u00fcrgen Locadia"},
+"team1":
+{"name":"MI","player1":"Erwin Mulder","player2":"Terence Kongolo","player3":"Bruno Martins Indi","player4":"Daryl Janmaat","player5":"Rajiv van La Parra","player6":"Luciano Narsingh","player7":"Nacer Chadli","player8":"Leroy Fer","player9":"Wilfried Guemiand Bony","player10":"Mike van der Hoorn","player11":"Rhu-endly Martina"},
 "team2":
-{"name":"MI","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":"","player1":""}}
+{"name":"MI","player1":"Erwin Mulder","player2":"Terence Kongolo","player3":"Bruno Martins Indi","player4":"Daryl Janmaat","player5":"Rajiv van La Parra","player6":"Luciano Narsingh","player7":"Nacer Chadli","player8":"Leroy Fer","player9":"Wilfried Guemiand Bony","player10":"Mike van der Hoorn","player11":"Rhu-endly Martina"}
 }'''
-print(query(s1))
+"""
+'''
+Toby Alderweireld
+Daley Blind
+Jan Vertonghen
+Christian  Dannemann Eriksen
+Davy Klaassen
+Niki M\u00e4enp\u00e4\u00e4
+Ragnar Klavan
+Johann  Berg Gu\u00f0munds\u00adson
+Erik Pieters
+Georginio Wijnaldum
+J\u00fcrgen Locadia
+'''
+
+
+'''
+Erwin Mulder
+Terence Kongolo
+Bruno Martins Indi
+Daryl Janmaat
+Rajiv van La Parra
+Luciano Narsingh
+Nacer Chadli
+Leroy Fer
+Wilfried Guemiand Bony
+Mike van der Hoorn
+Rhu-endly Martina
+
+
+while(True):
+    inp=input("location of input file")
+    f=open(inp,"r")
+    k=f.readlines()
+    query(k)
+    out=input("location of output file")
+    with open(out,"w") as f:
+        f.write(k)
+'''
+
