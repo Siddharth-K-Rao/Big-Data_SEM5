@@ -8,7 +8,7 @@ while(True):
         arg2=input("#Enter output file location: ")
         arg2.replace("\\","/")
         os.chdir("/opt/spark")
-        s='''spark-submit '/home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/metrics.py' '''+arg1+" "+arg2
+        s='''spark-submit '/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/metrics.py' '''+arg1+" "+arg2
         #print(s)
         os.system(s)
     except:
