@@ -31,7 +31,7 @@ def cluster(player_profile):
         if col in FEATURES_COL:#converts all feature_cols to float datatype
             df = df.withColumn(col,df[col].cast('float'))
     df = df.na.drop()
-
+    
     #combines features columns to make a single feature vector
     vecAssembler = VectorAssembler(inputCols=FEATURES_COL, outputCol="features")
     df_kmeans = vecAssembler.transform(df).select('Id', 'features')
@@ -39,7 +39,7 @@ def cluster(player_profile):
     k = 5#number of clusters
     #we have set maxIters to 3 so that processing is faster, otherwise VM crashed
     kmeans = KMeans().setK(k).setMaxIter(3).setSeed(1).setFeaturesCol("features")
-
+    
     #seeing if a model exists, then we use that.Otherwise make a new model in except and save it
     model_path = "/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/"+"kmeans_model"
     try:
@@ -51,10 +51,11 @@ def cluster(player_profile):
     
     centers = model.clusterCenters()#centroid of each cluster
     transformed = model.transform(df_kmeans).select('Id', 'prediction')#applies our model to the given data
-    rows = transformed.collect()#all players->id,prediction
+    rows = transformed.collect()
     df_pred = sqlContext.createDataFrame(rows)
-    df_pred = df_pred.join(df, 'Id')#adding prediction to original dataframe
-
+    df_pred = df_pred.join(df, 'Id')
+    
+    
     #gives a mean rating for each cluster of players
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
     
@@ -70,8 +71,8 @@ def cluster(player_profile):
 	 
 def new_rating(x):
     return ratings_di[x]
-    
-#user-defined function for making a new column from an old one
+
+#user-defined function for making a new column from an old one    
 udf_func = udf(new_rating,StringType())    	 	 
 
 
@@ -84,17 +85,14 @@ def date_diff(d1,d2):
 #user-defined function for making a new column from an old one	
 udf2 = udf(date_diff,StringType())
 
+
 # player_data -> dataframe with player_rating, date
 # match_date -> to predict the players rating on match_date
 def regression(player_data, match_date):
-    
     birth_date = player_data.select("date").collect()[0][0]
-    #x = firstdate.split("-")
-    #f_date = date(x[0],x[1],x[2])
     new_data = player_data.withColumn("birth_date",when(player_data.date != "",str(birth_date)).otherwise(player_data.date))
     new_data = new_data.withColumn("date",udf2(new_data.birth_date,new_data.date))
     new_data = new_data.withColumnRenamed("date","age")
-    #print(new_data.show())
     new_val = quad_regression(new_data,match_date)
     #print("return in regression",new_val)
     return new_val
@@ -102,11 +100,10 @@ def regression(player_data, match_date):
 
 def quad_regression(player_data,match_date):
     birth_date = player_data.select("birth_date").collect()[0][0]
-    #print("first",birth_date,"matchdate",match_date,"diff",date_diff(birth_date,match_date))
     age = int(date_diff(str(birth_date),match_date))
     age_sq = age*age
     test = sqlContext.createDataFrame([(age,age_sq,0)],['age','age_sq','label'])
-
+    print("test\n",test.show())
     data2 = player_data.withColumn('age_sq',player_data.age*player_data.age)
     data2 = data2.select(data2.age,data2.age_sq,data2.player_rating.alias('label'))
 
@@ -123,12 +120,17 @@ def quad_regression(player_data,match_date):
     lr = LinearRegression()#age_squared is the main factor
     model = lr.fit(train2)#training the model
     test1 = assembler.transform(test)
-    test2 = test1.select('features')
+    test2 = test1.select('features','label')
     test3 = model.transform(test2)
-    #print(test3.show())
     new_rating = test3.select("prediction").collect()[0][0]
+    
     #print("return in quad_regression",new_rating)
-    return new_rating
+    if new_rating>1:
+        return 0.99
+    elif new_rating<1:
+        return 0.2
+    else:
+        return new_rating    
 
 
 def get_chemistry(id1,id2):
@@ -140,6 +142,7 @@ def get_chemistry(id1,id2):
     except:
         chemistry = 0.5
     return float(chemistry)
+
 
 #schemas for defining the various data files that we have
 chemi=[StructField('key',StringType(),False),StructField('chemistry_coeff',StringType(),False)]
@@ -184,26 +187,26 @@ player_profile = cluster(player_profile)
 def winning_chance(player_profile,team1,team2,match_date):
     if(len(team1) < 11 or len(team2) < 11):
         return "Invalid team"
-    #just checking for valid-invalid teams
+    
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
         try:
-            d[player_profile.filter(player_profile.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+            d[player_profile.filter(player_profile.Id==i).select('role').collect()[0][0]] += 1#.__getitem__('role')]+=1
         except:    
             try:
-                d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+                d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem__('role')]+=1
             except Exception as e:
                 return "Invalid team"
-    if(d['GK']!=1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
+    if(d['GK']<1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
         return "Invalid team"
     
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
         try:
-            d[player_profile.filter(player_profile.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1            
+            d[player_profile.filter(player_profile.Id==i).select('role').collect()[0][0]] += 1#.__getitem__('role')]+=1            
         except:    
             try:
-                d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
+                d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem__('role')]+=1
             except:
                 return "Invalid team"
     if(d['GK']!=1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
@@ -221,22 +224,22 @@ def winning_chance(player_profile,team1,team2,match_date):
                     avg_chem += 0.5
 
         avg_chem = avg_chem/10
-        #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
-        #use regression to compute actual rating
+        #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]
+        #use regression to predict the player rating on the given date
         try:
             player_data = player_date_rating.filter(player_date_rating.Id == i)
             play_rating = regression(player_data,match_date)
         except:
-            try:#give 0.5 if not present in training data player_profile coming from master.py
-                play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
-            except:#players not in training data #coming from playercsv ratitng
-                play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')        
+            try:
+                play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]
+            except:
+                play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]
         
         if float(play_rating) < 0.2:
-            return ("Retired Player",player_profile2.filter(player_profile2.Id == i).select('name').collect()[0][0])
+            return ("Retired Player")
 
         player_strength = float(avg_chem)*float(play_rating)
-        #print("1rating--",play_rating,'avg_chem--',avg_chem,"strength",player_strength)
+        
         strength_a += player_strength
     strength_a = strength_a/11
 
@@ -252,20 +255,22 @@ def winning_chance(player_profile,team1,team2,match_date):
                     avg_chem += 0.5
         avg_chem = avg_chem/10
     
-        #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+        #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]
+        #use regression to predict the player rating on the given date
         try:
             player_data = player_date_rating.filter(player_date_rating.Id == i)
             play_rating = regression(player_data,match_date)
         except:
             try:
-                play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+                play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]
             except:
-                play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+                play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]
 
         if float(play_rating) < 0.2:
-            return ("Retired Player",player_profile2.filter(player_profile2.Id == i).select('name').collect()[0][0])        
+            return ("Retired Player")
+        
         player_strength = float(avg_chem)*float(play_rating)
-        #print("2rating--",play_rating,'avg_chem--',avg_chem,"strength",player_strength)
+        
         strength_b += player_strength
     strength_b = strength_b/11
     
@@ -280,7 +285,7 @@ def winning_chance(player_profile,team1,team2,match_date):
 def query(s):
     s = s.replace("\\u","\\\\u")
     d = json.loads(s)
-    #d = {'req_type': 2,'name': 'Rob Holding'}
+    
     if 'req_type' in d:
         if d['req_type'] == 1:#predictions here#d is the dictionary input file
             team1 = []
@@ -293,7 +298,6 @@ def query(s):
                         player_id = players_csv.filter(players_csv.name == d['team1'][i]).select("Id").collect()[0][0]                   
                         team1.append(player_id)
                     except Exception as e:                       
-                        #print("hereeee",d['team1'][i],e)
                         pass
                 else:
                     n1 = d['team1'][i]
@@ -308,11 +312,14 @@ def query(s):
             if k=="Invalid team":
                 out={"error":k}
                 return json.dumps(out,indent=2)
+            elif k == "Retired Player":
+                out={"error":k}
+                return json.dumps(out,indent=2)
             ch_a,ch_b=k[0],k[1]
             out = {"team1":{"name":n1,"winning_chance":ch_a},"team2":{"name":n2,"winning_chance":ch_b}}
             return json.dumps(out,indent=2)
             
-        elif d['req_type'] == 2:#just reading from files
+        elif d['req_type'] == 2:
             name = d['name']
             try:
                 player_id = player_profile.filter(player_profile.name == name).select("Id").collect()[0][0]
@@ -340,7 +347,7 @@ def query(s):
             
             return json.dumps(out,indent=2)
             
-    else:#match info needs to be returned#just reading from files
+    else:#match info needs to be returned
         date = d['date']
         label = d['label']
         key = date+" "+label
@@ -351,6 +358,7 @@ def query(s):
                 out = json.loads(res)
         return json.dumps(out,indent=2)
 
+
 #for connecting to the ui.py file for running the required functions for the tasks
 inpf = open(sys.argv[1],"r")
 playertext = inpf.read()
@@ -360,7 +368,10 @@ outf.write(ans)
 inpf.close()
 outf.close()
 
-"""   
+
+
+
+"""
 s1 = '''{"req_type": 2,"name": "Chris Brunt"}'''
 s2 = '''{"date":"2017-08-11","label":"Arsenal - Leicester City, 4 - 3"}'''
 s3 = '''
