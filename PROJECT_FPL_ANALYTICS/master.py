@@ -132,15 +132,17 @@ def matchupdate(matchdict,date,label):
                     name=broadcastplayers.value[str(k["playerId"])]
                 except:
                     continue
-                #print(name)
                 if int(k["ownGoals"])>0:
-                    dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
-                    di['own_goals'].append(dic)
-                if int(k["goals"])>0:
-                    dic={"name":name,"team":i[1],"number_of_goals":k["goals"]}  
-                    di["goals"].append(dic)
+                        dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
+                        di['own_goals'].append(dic)
+                try:
+                    if int(k["goals"])>0:
+                        dic={"name":name,"team":i[1],"number_of_goals":k["goals"]}  
+                        di["goals"].append(dic)
+                except:
+                    pass
                 if int(k['redCards']):
-                    di['red_cards'].append(name)
+                        di['red_cards'].append(name)
                 if int(k['yellowCards']):
                     di['yellow_cards'].append(name)
             for k in j['formation']['lineup']:
@@ -152,9 +154,12 @@ def matchupdate(matchdict,date,label):
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
                     di['own_goals'].append(dic)
-                if int(k["goals"])>0:
-                    dic={"name":name,"team":i[1],"number_of_goals":k["goals"]}  
-                    di["goals"].append(dic)
+                try:
+                    if int(k["goals"])>0:
+                        dic={"name":name,"team":i[1],"number_of_goals":k["goals"]}  
+                        di["goals"].append(dic)
+                except:
+                    pass
                 if int(k['redCards']):
                     di['red_cards'].append(name)
                 if int(k['yellowCards']):
@@ -164,12 +169,12 @@ def matchupdate(matchdict,date,label):
 
 def checkmatches(lines): 
     i=json.loads(lines)
-    global date1
+    #global date1
     if "wyId" in i:
         #match_init()
         dateutc=i["dateutc"].split(" ")[0]
-        date1=dateutc
-        print("here",date1)
+        #date1=dateutc
+        #print("here",date1)
         label=i["label"]
         yield (str(dateutc)+" "+str(label),matchupdate(i,i["dateutc"].split(" ")[0],i["label"]))
     else:
@@ -194,6 +199,8 @@ def cal_time(lines):
                 elif k=="lineup":
                     for l in j["teamsData"][i]["formation"][k]:
                         di[l["playerId"]]=(0,90)
+            if j["teamsData"][i]["formation"]["substitutions"]=='null':
+                continue
             for k in j["teamsData"][i]["formation"]["substitutions"]:
                 di[k["playerIn"]]=(k["minute"],90)
                 di[k["playerOut"]]=(di[k["playerOut"]][0],k['minute'])
