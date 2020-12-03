@@ -1,0 +1,10 @@
+{
+  "team1": {
+    "name": "Arsenal",
+    "winning_chance": 53
+  },
+  "team2": {
+    "name": "Leicester",
+    "winning_chance": 47
+  }
+}

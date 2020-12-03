@@ -51,7 +51,7 @@ def cluster(player_profile):
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
     
     for i in ratings.collect():
-        ratings_di[i._getitem('prediction')] = i.getitem_('avg_player_rating')
+        ratings_di[i.__getitem__('prediction')] = i.__getitem__('avg_player_rating')
 
     df_pred = df_pred.withColumn("player_rating",when(df_pred.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
     
@@ -219,8 +219,12 @@ def winning_chance(player_profile,team1,team2,match_date):
                 play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
             except:
                 play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')        
-        #print("rating--",play_rating,'avg_chem--',avg_chem)
+        
+        if float(play_rating) < 0.2:
+            return ("Retired Player",player_profile2.filter(player_profile2.Id == i).select('name').collect()[0][0])
+
         player_strength = float(avg_chem)*float(play_rating)
+        #print("1rating--",play_rating,'avg_chem--',avg_chem,"strength",player_strength)
         strength_a += player_strength
     strength_a = strength_a/11
 
@@ -231,7 +235,7 @@ def winning_chance(player_profile,team1,team2,match_date):
         for j in team2:
             if(i!=j):
                 try:
-                    avg_chem += chemistry[i][j]
+                    avg_chem += get_chemistry(i,j)
                 except:
                     avg_chem += 0.5
         avg_chem = avg_chem/10
@@ -245,7 +249,11 @@ def winning_chance(player_profile,team1,team2,match_date):
                 play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
             except:
                 play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+
+        if float(play_rating) < 0.2:
+            return ("Retired Player",player_profile2.filter(player_profile2.Id == i).select('name').collect()[0][0])        
         player_strength = float(avg_chem)*float(play_rating)
+        #print("2rating--",play_rating,'avg_chem--',avg_chem,"strength",player_strength)
         strength_b += player_strength
     strength_b = strength_b/11
     

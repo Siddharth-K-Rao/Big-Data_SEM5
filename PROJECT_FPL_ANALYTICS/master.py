@@ -128,7 +128,10 @@ def matchupdate(matchdict,date,label):
         if int(j['hasFormation']):
             for k in j['formation']['bench']:
                 #print((k["playerId"]),str(k["playerId"]))
-                name=broadcastplayers.value[str(k["playerId"])]
+                try:
+                    name=broadcastplayers.value[str(k["playerId"])]
+                except:
+                    continue
                 #print(name)
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
@@ -142,7 +145,10 @@ def matchupdate(matchdict,date,label):
                     di['yellow_cards'].append(name)
             for k in j['formation']['lineup']:
                 #print((k["playerId"]),str(k["playerId"]))
-                name=broadcastplayers.value[str(k["playerId"])]
+                try:
+                    name=broadcastplayers.value[str(k["playerId"])]
+                except:
+                    continue
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
                     di['own_goals'].append(dic)
@@ -268,14 +274,13 @@ conf.setAppName('BD_FPL_Project')
 spark=SparkSession.builder.appName("FPL_analytics").getOrCreate()
 
 #reading the csv of all players
-#playercsvt=spark.read.option('header',True).csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
-playercsvt=spark.read.option('header',True).csv("/home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
+playercsvt=spark.read.option('header',True).csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
 playercsv=playercsvt.select("Id","name").rdd.collectAsMap()#makes a dictionary of all players
 
 sc = spark.sparkContext
 broadcastplayers=sc.broadcast(playercsv)#available to all workers
 
-ssc=StreamingContext(sc,8) 
+ssc=StreamingContext(sc,24) 
 ssc.checkpoint('checkpoint_FPL')
 lines = ssc.socketTextStream("localhost", 6100)
 #for matches
@@ -406,7 +411,7 @@ particular_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desk
 rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerreg/players","txt")
 
 ssc.start()
-ssc.awaitTermination(20)#giving some extra time for computations
+ssc.awaitTermination(800)#giving some extra time for computations
 ssc.stop()
 
 '''

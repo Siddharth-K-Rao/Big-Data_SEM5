@@ -1,0 +1,44 @@
+{
+  "date": "2017-08-11",
+  "duration": "Regular",
+  "gameweek": 1,
+  "venue": "Emirates Stadium",
+  "winner": "Leicester City",
+  "goals": [
+    {
+      "name": "Olivier Giroud",
+      "team": "Arsenal",
+      "number_of_goals": "1"
+    },
+    {
+      "name": "Aaron Ramsey",
+      "team": "Arsenal",
+      "number_of_goals": "1"
+    },
+    {
+      "name": "Daniel Nii Tackie Mensah Welbeck",
+      "team": "Arsenal",
+      "number_of_goals": "1"
+    },
+    {
+      "name": "Alexandre Lacazette",
+      "team": "Arsenal",
+      "number_of_goals": "1"
+    },
+    {
+      "name": "Shinji Okazaki",
+      "team": "Leicester City",
+      "number_of_goals": "1"
+    },
+    {
+      "name": "Jamie Vardy",
+      "team": "Leicester City",
+      "number_of_goals": "2"
+    }
+  ],
+  "own_goals": [],
+  "yellow_cards": [
+    "Wes Morgan"
+  ],
+  "red_cards": []
+}
