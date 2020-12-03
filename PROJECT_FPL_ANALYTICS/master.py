@@ -128,7 +128,10 @@ def matchupdate(matchdict,date,label):
         if int(j['hasFormation']):
             for k in j['formation']['bench']:
                 #print((k["playerId"]),str(k["playerId"]))
-                name=broadcastplayers.value[str(k["playerId"])]
+                try:
+                    name=broadcastplayers.value[str(k["playerId"])]
+                except:
+                    continue
                 #print(name)
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
@@ -142,7 +145,10 @@ def matchupdate(matchdict,date,label):
                     di['yellow_cards'].append(name)
             for k in j['formation']['lineup']:
                 #print((k["playerId"]),str(k["playerId"]))
-                name=broadcastplayers.value[str(k["playerId"])]
+                try:
+                    name=broadcastplayers.value[str(k["playerId"])]
+                except:
+                    continue
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
                     di['own_goals'].append(dic)
@@ -399,11 +405,11 @@ def cal_karo_ji(lines):
 rate_date_change=rate_date_change.flatMap(cal_karo_ji)
 rate_date_change.pprint()
 
-allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/matchdata/matchinfo","txt")
-chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/chem/chemdata","txt")
-allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerdata/playerinfo","txt")
-particular_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerrank/rating","txt")
-rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/FPL/playerreg/players","txt")
+allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/matchdata/matchinfo","txt")
+chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/chem/chemdata","txt")
+allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerdata/playerinfo","txt")
+particular_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerrank/rating","txt")
+rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerreg/players","txt")
 
 ssc.start()
 ssc.awaitTermination(20)#giving some extra time for computations
