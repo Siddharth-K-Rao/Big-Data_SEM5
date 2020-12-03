@@ -128,7 +128,10 @@ def matchupdate(matchdict,date,label):
         if int(j['hasFormation']):
             for k in j['formation']['bench']:
                 #print((k["playerId"]),str(k["playerId"]))
-                name=broadcastplayers.value[str(k["playerId"])]
+                try:
+                    name=broadcastplayers.value[str(k["playerId"])]
+                except:
+                    continue
                 #print(name)
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
@@ -142,7 +145,10 @@ def matchupdate(matchdict,date,label):
                     di['yellow_cards'].append(name)
             for k in j['formation']['lineup']:
                 #print((k["playerId"]),str(k["playerId"]))
-                name=broadcastplayers.value[str(k["playerId"])]
+                try:
+                    name=broadcastplayers.value[str(k["playerId"])]
+                except:
+                    continue
                 if int(k["ownGoals"])>0:
                     dic={"name":name,"team":i[1],"number_of_own_goals":k["ownGoals"]}
                     di['own_goals'].append(dic)
