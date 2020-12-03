@@ -354,8 +354,13 @@ def query(s):
         for line in lines:
             if key in line:
                 res = line.split(";")[1]
-                out = json.loads(res)
-        return json.dumps(out,indent=2)
+                try:
+                    out = json.loads(res)
+                    return json.dumps(out,indent=2)
+                except:
+                    return res
+        return json.dumps({"error":"Match Not Found"})
+        
 
 
 #for connecting to the ui.py file for running the required functions for the tasks
