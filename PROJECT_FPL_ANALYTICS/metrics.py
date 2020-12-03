@@ -14,40 +14,48 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import StructField,StructType,StringType,IntegerType,FloatType
 
-
+#creation of spark session and spark context for ML parts
 spark = SparkSession.builder.appName("FPL_ML").getOrCreate()
 sc=spark.sparkContext
 sqlContext = SQLContext(sc)
 
-
+#store the average rating of a cluster of players
 ratings_di={}
 
 #player_profile -> dataframe
 def cluster(player_profile):
     df=player_profile
+    #columns used for clustering -> features
     FEATURES_COL = ['fouls','goals','own_goals','pass1','pass2','pass3','st1','st2','st3']
     for col in df.columns:
-        if col in FEATURES_COL:
+        if col in FEATURES_COL:#converts all feature_cols to float datatype
             df = df.withColumn(col,df[col].cast('float'))
     df = df.na.drop()
+
+    #combines features columns to make a single feature vector
     vecAssembler = VectorAssembler(inputCols=FEATURES_COL, outputCol="features")
     df_kmeans = vecAssembler.transform(df).select('Id', 'features')
-    k = 5
+    
+    k = 5#number of clusters
+    #we have set maxIters to 3 so that processing is faster, otherwise VM crashed
     kmeans = KMeans().setK(k).setMaxIter(3).setSeed(1).setFeaturesCol("features")
+
+    #seeing if a model exists, then we use that.Otherwise make a new model in except and save it
     model_path = "/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/"+"kmeans_model"
     try:
         model = KMeansModel.load(model_path)
         #print("loading saved model")
     except:
-        model = kmeans.fit(df_kmeans)
+        model = kmeans.fit(df_kmeans)#this is the time consuming part
         model.save(model_path)
     
-    centers = model.clusterCenters()
-    transformed = model.transform(df_kmeans).select('Id', 'prediction')
-    rows = transformed.collect()
+    centers = model.clusterCenters()#centroid of each cluster
+    transformed = model.transform(df_kmeans).select('Id', 'prediction')#applies our model to the given data
+    rows = transformed.collect()#all players->id,prediction
     df_pred = sqlContext.createDataFrame(rows)
-    df_pred = df_pred.join(df, 'Id')
+    df_pred = df_pred.join(df, 'Id')#adding prediction to original dataframe
 
+    #gives a mean rating for each cluster of players
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
     
     for i in ratings.collect():
@@ -55,7 +63,7 @@ def cluster(player_profile):
 
     df_pred = df_pred.withColumn("player_rating",when(df_pred.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
     
-    
+    #returns the ratings
     #print(df_pred.show())
     return df_pred
 
@@ -63,6 +71,7 @@ def cluster(player_profile):
 def new_rating(x):
     return ratings_di[x]
     
+#user-defined function for making a new column from an old one
 udf_func = udf(new_rating,StringType())    	 	 
 
 
@@ -71,12 +80,14 @@ def date_diff(d1,d2):
     d2 = dt.datetime.strptime(d2, "%Y-%m-%d")
     diff = (d2 - d1).days
     return str(diff)
-	
+
+#user-defined function for making a new column from an old one	
 udf2 = udf(date_diff,StringType())
 
 # player_data -> dataframe with player_rating, date
 # match_date -> to predict the players rating on match_date
 def regression(player_data, match_date):
+    
     birth_date = player_data.select("date").collect()[0][0]
     #x = firstdate.split("-")
     #f_date = date(x[0],x[1],x[2])
@@ -109,8 +120,8 @@ def quad_regression(player_data,match_date):
     train = assembler.transform(data2)
     train2 = train.select("features","label")
 
-    lr = LinearRegression()
-    model = lr.fit(train2)
+    lr = LinearRegression()#age_squared is the main factor
+    model = lr.fit(train2)#training the model
     test1 = assembler.transform(test)
     test2 = test1.select('features')
     test3 = model.transform(test2)
@@ -130,6 +141,7 @@ def get_chemistry(id1,id2):
         chemistry = 0.5
     return float(chemistry)
 
+#schemas for defining the various data files that we have
 chemi=[StructField('key',StringType(),False),StructField('chemistry_coeff',StringType(),False)]
 chem_struct=StructType(fields=chemi)
 
@@ -172,7 +184,7 @@ player_profile = cluster(player_profile)
 def winning_chance(player_profile,team1,team2,match_date):
     if(len(team1) < 11 or len(team2) < 11):
         return "Invalid team"
-    
+    #just checking for valid-invalid teams
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
     for i in team1:
         try:
@@ -182,7 +194,7 @@ def winning_chance(player_profile,team1,team2,match_date):
                 d[player_profile2.filter(player_profile2.Id==i).select('role').collect()[0][0]] += 1#.__getitem('role')]+=1
             except Exception as e:
                 return "Invalid team"
-    if(d['GK']<1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
+    if(d['GK']!=1 or d['DF']<3 or d['MD']<2 or d['FW']<1):
         return "Invalid team"
     
     d = {'GK':0,'DF':0,'MD':0,'FW':0}
@@ -215,9 +227,9 @@ def winning_chance(player_profile,team1,team2,match_date):
             player_data = player_date_rating.filter(player_date_rating.Id == i)
             play_rating = regression(player_data,match_date)
         except:
-            try:
+            try:#give 0.5 if not present in training data player_profile coming from master.py
                 play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
-            except:
+            except:#players not in training data #coming from playercsv ratitng
                 play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')        
         
         if float(play_rating) < 0.2:
@@ -270,7 +282,7 @@ def query(s):
     d = json.loads(s)
     #d = {'req_type': 2,'name': 'Rob Holding'}
     if 'req_type' in d:
-        if d['req_type'] == 1:
+        if d['req_type'] == 1:#predictions here#d is the dictionary input file
             team1 = []
             team2 = []
             date = d['date']
@@ -300,7 +312,7 @@ def query(s):
             out = {"team1":{"name":n1,"winning_chance":ch_a},"team2":{"name":n2,"winning_chance":ch_b}}
             return json.dumps(out,indent=2)
             
-        elif d['req_type'] == 2:
+        elif d['req_type'] == 2:#just reading from files
             name = d['name']
             try:
                 player_id = player_profile.filter(player_profile.name == name).select("Id").collect()[0][0]
@@ -328,7 +340,7 @@ def query(s):
             
             return json.dumps(out,indent=2)
             
-    else:#match info needs to be returned
+    else:#match info needs to be returned#just reading from files
         date = d['date']
         label = d['label']
         key = date+" "+label
@@ -339,6 +351,7 @@ def query(s):
                 out = json.loads(res)
         return json.dumps(out,indent=2)
 
+#for connecting to the ui.py file for running the required functions for the tasks
 inpf = open(sys.argv[1],"r")
 playertext = inpf.read()
 ans = query(playertext)
