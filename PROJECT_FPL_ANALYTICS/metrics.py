@@ -146,11 +146,11 @@ pdr = [StructField('Id',StringType(),False),StructField('date',StringType(),Fals
 pdrstruct = StructType(fields=pdr)
 
 players_csv = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv",header=True)#player data like name id birthdate...
-player_info = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerdata/playerinfo/part-00000",schema=player_struct,header=False)#has fouls goals etc
-id_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerrank/rating/part-00000",schema=idstruct,header=False)# has Id,player_rating
-chem = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/chem/chemdata/part-00000",schema=chem_struct,header=False)# player1Id;player2Id,chemistry
-match_data = sc.textFile("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/matchdata/matchinfo/part-00000")
-player_date_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/playerreg/players/part-00000",schema=pdrstruct,header=False)
+player_info = spark.read.csv("/home/revanth/Desktop/FPL/playerdata/playerinfo/part-00000",schema=player_struct,header=False)#has fouls goals etc
+id_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerrank/rating/part-00000",schema=idstruct,header=False)# has Id,player_rating
+chem = spark.read.csv("/home/revanth/Desktop/FPL/chem/chemdata/part-00000",schema=chem_struct,header=False)# player1Id;player2Id,chemistry
+match_data = sc.textFile("/home/revanth/Desktop/FPL/matchdata/matchinfo/part-00000")
+player_date_rating = spark.read.csv("/home/revanth/Desktop/FPL/playerreg/players/part-00000",schema=pdrstruct,header=False)
 
 
 player_info = player_info.join(id_rating,['Id']) #has Id,rating,fouls,goals etc
@@ -219,8 +219,12 @@ def winning_chance(player_profile,team1,team2,match_date):
                 play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
             except:
                 play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')        
-        #print("rating--",play_rating,'avg_chem--',avg_chem)
+        
+        if float(play_rating) < 0.2:
+            return ("Retired Player",player_profile2.filter(player_profile2.Id == i).select('name').collect()[0][0])
+
         player_strength = float(avg_chem)*float(play_rating)
+        #print("1rating--",play_rating,'avg_chem--',avg_chem,"strength",player_strength)
         strength_a += player_strength
     strength_a = strength_a/11
 
@@ -231,7 +235,7 @@ def winning_chance(player_profile,team1,team2,match_date):
         for j in team2:
             if(i!=j):
                 try:
-                    avg_chem += chemistry[i][j]
+                    avg_chem += get_chemistry(i,j)
                 except:
                     avg_chem += 0.5
         avg_chem = avg_chem/10
@@ -245,7 +249,11 @@ def winning_chance(player_profile,team1,team2,match_date):
                 play_rating = player_profile.filter(player_profile.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
             except:
                 play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]#.getitem('player_rating')
+
+        if float(play_rating) < 0.2:
+            return ("Retired Player",player_profile2.filter(player_profile2.Id == i).select('name').collect()[0][0])        
         player_strength = float(avg_chem)*float(play_rating)
+        #print("2rating--",play_rating,'avg_chem--',avg_chem,"strength",player_strength)
         strength_b += player_strength
     strength_b = strength_b/11
     
