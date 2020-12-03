@@ -284,7 +284,6 @@ sc = spark.sparkContext
 broadcastplayers=sc.broadcast(playercsv)#available to all workers
 
 #dstream for data collection
-ssc=StreamingContext(sc,8) 
 ssc.checkpoint('checkpoint_FPL')
 lines = ssc.socketTextStream("localhost", 6100)
 
@@ -434,14 +433,14 @@ def cal_karo_ji(lines):
 rate_date_change=rate_date_change.flatMap(cal_karo_ji)
 #rate_date_change.pprint()
 
-#allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/matchdata/matchinfo","txt")
-#chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/chem/chemdata","txt")
-#allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerdata/playerinfo","txt")
-#all_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerrank/rating","txt")
-#rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerreg/players","txt")
+allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/matchdata/matchinfo","txt")
+chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/chem/chemdata","txt")
+allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerdata/playerinfo","txt")
+all_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerrank/rating","txt")
+rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerreg/players","txt")
 
 ssc.start()
-ssc.awaitTermination(20)#giving some extra time for computations
+ssc.awaitTermination(800)#giving some extra time for computations
 ssc.stop()
 
 '''

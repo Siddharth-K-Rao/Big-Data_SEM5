@@ -1,0 +1,15 @@
+{
+  "name": "Yohan Cabaye",
+  "birthArea": "France",
+  "birthDate": "1986-01-14",
+  "foot": "right",
+  "role": "MD",
+  "height": "174",
+  "passportArea": "France",
+  "weight": "71",
+  "fouls": 2.0,
+  "goals": 0.0,
+  "own_goals": 0.0,
+  "percentage_pass_accuracy": 75,
+  "percent_shots_on_target": 0
+}
