@@ -11,4 +11,4 @@
 ### Running the Code
 1. Start the streaming program on port 6100.
 2. Now while the data is ready to be streamed, run metrics.py using spark-submit which will ingest the data being streamed and will perform computations.
-3. Run ui.py -> if a model for clustering is already made then the computation for each of the requests will be quite fast otherwise, it may take time.
+3. Run ui.py -> which will internally delete the non required intermediate data, will call metrics.py internally. If a model for clustering is already available then the computation for each of the requests will be quite fast otherwise, it may take some extra time.
