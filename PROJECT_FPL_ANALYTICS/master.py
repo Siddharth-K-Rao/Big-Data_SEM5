@@ -16,12 +16,13 @@ from pyspark.sql import functions as F
 from pyspark.sql.types import StructField,StructType,StringType,IntegerType,FloatType
 date1=0
 
+#updateStateByKey's function header parameters: (new_list,old_list)
+
 def combine(new_list,old_list):
-    if not(new_list):
+    if not(new_list): #data for the current match
         return old_list
-    if not(old_list):
+    if not(old_list): #combination of all matches till the current match
         return new_list
-    #print("here ",old_list+new_list)
     return old_list+new_list
 
 def combine_list(new_list,old_list):
@@ -40,11 +41,11 @@ def combine_events(new_list,old_list):
         old_list=[old_list[k]+i[k] for k in range(15)]
     return old_list+[new_list[-1][-1]] if new_list else old_list
 
-def combine_final_events(new_list,old_list):
+def combine_final_events(new_list,old_list):#returns for all matches played till now
     if not(old_list):
         old_list=[0 for i in range(10)]
     #print("here",new_list)
-    #returns fouls,goals,own_goals,pass metrics,shots metrics
+    #returns fouls,goals,own_goals,pass metrics,shots metrics and number of matches played
     z=old_list.copy()
     try:
         x=[new_list[0][13],new_list[0][12],new_list[0][14],new_list[0][0],new_list[0][1],new_list[0][2],new_list[0][9],new_list[0][10],new_list[0][11]]
@@ -53,17 +54,17 @@ def combine_final_events(new_list,old_list):
         pass
     return z
 
-def eventupdate(lines):
+def eventupdate(lines):#for a particular event it will return a tuple for the player
     i=json.loads(lines)
     player=(i["playerId"],[0 for i in range(16)])
-    #player[1]=[acc_pass,key_pass,tot_pass,dw,dn,dt,acc_fk,penal_scored,total_fk,\
+    #player[i][1]=[acc_pass,key_pass,tot_pass,dw,dn,dt,acc_fk,penal_scored,total_fk,\
     # stg,st,totalshots,goals,fouls,own_goals,teamID]
     j=i["eventId"]
     tags=[k["id"] for k in i["tags"]]
     player[1][-1]=i["teamId"]
-    if 102 in tags:
+    if 102 in tags:#own_goals
         player[1][14]+=1
-    if 101 in tags:
+    if 101 in tags:#goals
         player[1][12]+=1
     if j==8:
         if 302 in tags:
@@ -100,7 +101,7 @@ def eventupdate(lines):
         player[1][13]+=1
     return player
 
-def matchupdate(matchdict,date,label):
+def matchupdate(matchdict,date,label):#for every match gives the match_details for that match which are then updated throughout
     datatuple=str(date)+" "+str(label)
     di={}
     di['date']=date
@@ -127,7 +128,7 @@ def matchupdate(matchdict,date,label):
         j=matchdict["teamsData"][i[0]]
         if int(j['hasFormation']):
             for k in j['formation']['bench']:
-                #print((k["playerId"]),str(k["playerId"]))
+                #there is an id which is not given in player.csv
                 try:
                     name=broadcastplayers.value[str(k["playerId"])]
                 except:
@@ -146,7 +147,6 @@ def matchupdate(matchdict,date,label):
                 if int(k['yellowCards']):
                     di['yellow_cards'].append(name)
             for k in j['formation']['lineup']:
-                #print((k["playerId"]),str(k["playerId"]))
                 try:
                     name=broadcastplayers.value[str(k["playerId"])]
                 except:
@@ -171,20 +171,13 @@ def checkmatches(lines):
     i=json.loads(lines)
     #global date1
     if "wyId" in i:
-        #match_init()
         dateutc=i["dateutc"].split(" ")[0]
-        #date1=dateutc
-        #print("here",date1)
         label=i["label"]
+        #This uniquely identifies a match based on date and label
         yield (str(dateutc)+" "+str(label),matchupdate(i,i["dateutc"].split(" ")[0],i["label"]))
     else:
         pass
 
-'''
-def checkevents(lines):
-    i=json.loads(lines)
-    if "wyId" not in i:#means it is an event
-'''
 
 #assumed once a player is subbed in, he is never subbed out
 def cal_time(lines):
@@ -210,7 +203,7 @@ def cal_time(lines):
         else:
             yield(i,(di[i][1]-di[i][0])/90)
 
-def match_calc_full(a,b):
+def match_calc_full(a,b):#all stats of a particular player for a match will be added together
     if not(a) and not(b):
         return []
     if not(a):
@@ -227,9 +220,9 @@ def stat_calculator(z):
     if not(z):
         return []
     #print("here",z)
-    a=float(z[1][0])
-    k=z[1][1]
-    k[-1]=int(k[-1])
+    a=float(z[1][0])#normalization factor 1.05 or lesser
+    k=z[1][1]#16 length list
+    k[-1]=int(k[-1])#team ID
     u,v,w,x=0,0,0,0
     #print("here",k,a)
     try:
@@ -249,27 +242,28 @@ def stat_calculator(z):
     except:
         pass
     player_contrib=((u+v+w+x)/4)*a
-    player_contrib=player_contrib-(0.05*k[13]+0.5*k[14])*player_contrib
-    #print(player_contrib,k[15])
+    player_contrib=player_contrib-(0.005*k[13]+0.05*k[14])*player_contrib
+    #player_ID,player_performance_,team_ID
     return (z[0],player_contrib,k[15])
 
 def change_rating(new_list,old_list):
     if not(new_list):
         return old_list
     if not(old_list):
-        old_list=(0.5,0)
+        old_list=(0.5,0)#0.5 is initial rating,0 is change in rating
+    #[[normalized player perf,team ID]]
     k=(old_list[0]+new_list[0][0])/2
-    #print(k)
+    #current rating, change in rating, team_ID
     return (k,k-old_list[0],new_list[0][1])
 
-def get_date(lines):
+def get_date(lines):#to get the date of the match based on (teamID1,date) and (teamID2,date) for a join function later
     x=json.loads(lines)
     date=x["dateutc"].split(" ")[0]
     teams=list(x['teamsData'].keys())
     for i in teams:
         yield (int(i),date)
 
-def final_comb(lines):
+def final_comb(lines):#used for regression: ID,change_in_rating
     #print(lines)
     if not(lines):
         return []
@@ -281,21 +275,24 @@ conf.setAppName('BD_FPL_Project')
 spark=SparkSession.builder.appName("FPL_analytics").getOrCreate()
 
 #reading the csv of all players
-#playercsvt=spark.read.option('header',True).csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
-playercsvt=spark.read.option('header',True).csv("/home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
-playercsv=playercsvt.select("Id","name").rdd.collectAsMap()#makes a dictionary of all players
+playercsvt=spark.read.option('header',True).csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
+#playercsvt=spark.read.option('header',True).csv("/home/sreyans/Desktop/SEM5/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/players.csv")
 
+#player and ID based dictionary used for match analysis and broadcasted to all the workers for the analysis.
+playercsv=playercsvt.select("Id","name").rdd.collectAsMap()#makes a dictionary of all players
 sc = spark.sparkContext
 broadcastplayers=sc.broadcast(playercsv)#available to all workers
 
+#dstream for data collection
 ssc=StreamingContext(sc,8) 
 ssc.checkpoint('checkpoint_FPL')
 lines = ssc.socketTextStream("localhost", 6100)
-#for matches
+
+#for matches-> we filter only the match data from lines
 matchdata=lines.filter(lambda x:True if "wyId" in json.loads(x) else False)
 #matchdata.pprint()
 
-#gives the info about a match
+#gives the info about a match using the function checkdata
 matches=matchdata.flatMap(checkmatches)
 #matches.pprint()
 
@@ -307,12 +304,13 @@ datematches=matchdata.flatMap(get_date)
 allmatches=matches.updateStateByKey(combine)
 #allmatches.pprint()
 
+#To make it easier for us to read a csv file
 def make_str(lines):
-    label=(lines[0]+';'+str(lines[1]).strip("[]")).replace("'",'"')
+    label=(lines[0]+';'+str(lines[1]).strip("[]")).replace("'",'"')#returns label;dictionary for the match
     return label
 allmatches1=allmatches.map(make_str)
 
-#players on field time
+#players on field time and performance factor
 times=matchdata.flatMap(cal_time)
 #times.pprint()
 
@@ -320,46 +318,57 @@ times=matchdata.flatMap(cal_time)
 events=lines.filter(lambda x:True if "wyId" not in json.loads(x) else False)
 #events.pprint()
 
-#based on the event return the stat for a player for that event
+#based on a particular event return the stat for a player for that event
 playermatchstats=events.map(eventupdate)
 #playermatchstats.pprint()
 
 #combines all events for each player
+#of the form (playerID,[list of 16])
 playermatchstats=playermatchstats.reduceByKey(match_calc_full)
 #playermatchstats.pprint()
 
 #normalised performance
 newtimes=times.join(playermatchstats)
+#playerID,(normalizationfactor,[16 length])
 #newtimes.pprint()
 
-#matchevents return playerID,[normalised_player_performance,teamID] for a match
 matchevents=newtimes.map(stat_calculator)#gives the performance in a match and team 
 matchevents=matchevents.map(lambda x:(x[0],[x[1],x[2]]))
+#matchevents return playerID,[normalised_player_performance,teamID] for a match
 #matchevents.pprint()
 
 #for all the matches how a player has performed
 #returns (new_rating,change_in_rating,player_ID)
 change_in_player_ratings=matchevents.updateStateByKey(change_rating)
+#of the form (playerID,(current rating, change_in_rating, team_ID))
 #change_in_player_ratings.pprint()
 
 #for pass_accuracy calculation because they can be determined from past status
 allmatchevents=playermatchstats.updateStateByKey(combine_final_events)
+#of the form (playerId,[fouls,goals,own_goals,pass metrics,shots metrics,number of matches played])
 #allmatchevents.pprint()
 
 #all the metrics -> of the current match including change in ratings
 particular_match_change=matchevents.join(change_in_player_ratings)
+#of the form (player_ID,([normalised_player_performance_of_the_match,teamID],(current_rating, change_in_rating, team_ID)))
+
 particular_match_change=particular_match_change.map(final_comb)
+#returns (player_id,(player_rating_after_game,change_in_rating,team_ID)) for the particular game
 #particular_match_change.pprint()
 
-#returns teamID,[playerID,changeInRating]
 particular_rate_change=particular_match_change.map(lambda x:(x[1][2],[x[0],x[1][0]]))
-
+#returns (teamID,[playerID,player_Rating_after_game])
 rate_date_change=particular_rate_change.join(datematches)
+#returns (team_ID,([playerID,current_rating],date))
 rate_date_change=rate_date_change.map(lambda x:(x[1][0][0],(x[1][1],x[1][0][-1])))
+#returns (player_ID,(date,rating))
+
 rate_date_change=rate_date_change.updateStateByKey(combine_list)
+#for all matches: (player_ID,[[(date,rating)],[(date,rating)]])
 #rate_date_change.pprint()
 
 particular_rate_change=particular_match_change.map(lambda x:(x[1][2],[x[0],x[1][1]]))
+#returns (team_ID,[player_id,change_rating])
 #particular_rate_change.pprint()
 
 def cart_prod(rdd_a,rdd_b):
@@ -393,14 +402,27 @@ def chem_cal(new_list,old_list):
     return old_list+new_list[0]
 
 cart_prod_dstream=particular_rate_change.transformWith(cart_prod,particular_rate_change)
+#returns ((team_ID,[player_id,change_rating]),(team_ID,[player_id,change_rating]))
 cart_prod_dstream=cart_prod_dstream.filter(lambda x:x[0][1][0]!=x[1][1][0])
+#all same player_ids are removed
 cart_prod_dstream=cart_prod_dstream.flatMap(calcoeff)
+#returns ((player_ID1,player_ID2),chemistry_coefficient_for_match)
 #cart_prod_dstream.pprint()
 
 chem_coeff=cart_prod_dstream.updateStateByKey(chem_cal)
+#returns ((player_ID1,player_ID2),chemistry_coefficient_overall)
 #chem_coeff.pprint()
 
-particular_rate_change=particular_match_change.map(lambda x:str((x[0],x[1][0])).strip("()"))
+def all_player_ratings(new_list,old_list):
+    if not(new_list):
+        return old_list
+    return new_list[0][0]
+
+particular_rate_change=particular_match_change.updateStateByKey(all_player_ratings)
+#returns player_ID,player_rating_after_game
+all_rate_change = particular_rate_change.map(lambda x:str((x[0],x[1])).strip("()"))
+#returns player_ID,player_rating_after_all_games
+all_rate_change.pprint()
 #particular_rate_change.pprint()
 
 #id,date,rating
@@ -410,13 +432,13 @@ def cal_karo_ji(lines):
         yield(str(lines[0])+","+tup[0]+","+str(tup[1]))
 
 rate_date_change=rate_date_change.flatMap(cal_karo_ji)
-rate_date_change.pprint()
+#rate_date_change.pprint()
 
-allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/matchdata/matchinfo","txt")
-chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/chem/chemdata","txt")
-allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerdata/playerinfo","txt")
-particular_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerrank/rating","txt")
-rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerreg/players","txt")
+#allmatches1.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/matchdata/matchinfo","txt")
+#chem_coeff.map(lambda x:str(x[0][0])+";"+str(x[0][1])+","+str(x[1])).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/chem/chemdata","txt")
+#allmatchevents.map(lambda x:str(x).strip("[]()").replace("[","")).repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerdata/playerinfo","txt")
+#all_rate_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerrank/rating","txt")
+#rate_date_change.repartition(1).saveAsTextFiles("file:///home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/data/playerreg/players","txt")
 
 ssc.start()
 ssc.awaitTermination(20)#giving some extra time for computations
