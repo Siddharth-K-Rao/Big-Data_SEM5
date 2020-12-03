@@ -7,9 +7,9 @@
   "height": "187",
   "passportArea": "Northern Ireland",
   "weight": "85",
-  "fouls": 1.0,
+  "fouls": 2.0,
   "goals": 0.0,
   "own_goals": 0.0,
-  "percentage_pass_accuracy": 46,
+  "percentage_pass_accuracy": 64,
   "percent_shots_on_target": 0
 }
