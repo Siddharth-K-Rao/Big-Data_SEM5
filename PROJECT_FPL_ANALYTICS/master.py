@@ -284,7 +284,6 @@ sc = spark.sparkContext
 broadcastplayers=sc.broadcast(playercsv)#available to all workers
 
 #dstream for data collection
-ssc=StreamingContext(sc,20) 
 ssc.checkpoint('checkpoint_FPL')
 lines = ssc.socketTextStream("localhost", 6100)
 

@@ -103,7 +103,6 @@ def quad_regression(player_data,match_date):
     age = int(date_diff(str(birth_date),match_date))
     age_sq = age*age
     test = sqlContext.createDataFrame([(age,age_sq,0)],['age','age_sq','label'])
-    
     data2 = player_data.withColumn('age_sq',player_data.age*player_data.age)
     data2 = data2.select(data2.age,data2.age_sq,data2.player_rating.alias('label'))
 
