@@ -225,7 +225,7 @@ def stat_calculator(z):
     k[-1]=int(k[-1])#team ID
     u,v,w,x=0,0,0,0
     #print("here",k,a)
-    try:
+    try:#for division by 0 error
         u=(k[0]+k[1])/k[2]#pass accuracy
     except:
         pass
@@ -291,7 +291,7 @@ lines = ssc.socketTextStream("localhost", 6100)
 matchdata=lines.filter(lambda x:True if "wyId" in json.loads(x) else False)
 #matchdata.pprint()
 
-#gives the info about a match using the function checkdata
+#gives the info about a match using the function checkmatches
 matches=matchdata.flatMap(checkmatches)
 #matches.pprint()
 
@@ -305,11 +305,11 @@ allmatches=matches.updateStateByKey(combine)
 
 #To make it easier for us to read a csv file
 def make_str(lines):
-    label=(lines[0]+';'+str(lines[1]).strip("[]")).replace("'",'"')#returns label;dictionary for the match
+    label=(lines[0]+';'+str(lines[1]).strip("[]")).replace("'",'"')#returns key;dictionary for the match where key is (date label)
     return label
 allmatches1=allmatches.map(make_str)
 
-#players on field time and performance factor
+#players ID and performance factor
 times=matchdata.flatMap(cal_time)
 #times.pprint()
 
