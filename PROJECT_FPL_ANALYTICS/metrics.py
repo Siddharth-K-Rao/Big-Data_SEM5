@@ -126,7 +126,7 @@ def quad_regression(player_data,match_date):
     if new_rating>1:
         return 0.99
     elif new_rating<1:
-        return 0.2
+        return 0.0
     else:
         return new_rating    
 
