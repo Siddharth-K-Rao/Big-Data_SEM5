@@ -37,8 +37,7 @@ def cluster(player_profile):
     df_kmeans = vecAssembler.transform(df).select('Id', 'features')
     
     k = 5#number of clusters
-    #we have set maxIters to 3 so that processing is faster, otherwise VM crashed
-    kmeans = KMeans().setK(k).setMaxIter(3).setSeed(1).setFeaturesCol("features")
+    kmeans = KMeans().setK(k).setMaxIter(20).setSeed(1).setFeaturesCol("features")
     
     #seeing if a model exists, then we use that.Otherwise make a new model in except and save it
     model_path = "/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5/PROJECT_FPL_ANALYTICS/"+"kmeans_model"
@@ -50,7 +49,7 @@ def cluster(player_profile):
         model.save(model_path)
     
     centers = model.clusterCenters()#centroid of each cluster
-    transformed = model.transform(df_kmeans).select('Id', 'prediction')#applies our model to the given data
+    transformed = model.transform(df_kmeans).select('Id', 'prediction')#applies our model to the given data, giving the cluster number for all id's
     rows = transformed.collect()
     df_pred = sqlContext.createDataFrame(rows)
     df_pred = df_pred.join(df, 'Id')
@@ -59,7 +58,7 @@ def cluster(player_profile):
     #gives a mean rating for each cluster of players
     ratings=df_pred.groupby('prediction').agg({'player_rating':'mean'}).withColumnRenamed('avg(player_rating)','avg_player_rating').select("prediction","avg_player_rating")
     
-    for i in ratings.collect():
+    for i in ratings.collect():#convert dataframe to dictionary
         ratings_di[i.__getitem__('prediction')] = i.__getitem__('avg_player_rating')
 
     df_pred = df_pred.withColumn("player_rating",when(df_pred.no_of_matches<5,udf_func(df_pred.prediction)).otherwise(df_pred.player_rating))
@@ -170,7 +169,7 @@ player_date_rating = spark.read.csv("/home/revanth/Desktop/SEM5/BD/Big_Data_SEM5
 player_info = player_info.join(id_rating,['Id']) #has Id,rating,fouls,goals etc
 player_profile = players_csv.join(player_info,['Id']) #join of everything
 
-player_profile2 = players_csv.join(player_info,['Id'],how='full')
+player_profile2 = players_csv.join(player_info,['Id'],how='full')#full outer join
 player_profile2 = player_profile2.na.fill(value="0")
 player_profile2 = player_profile2.withColumn("player_rating",when(player_profile2.player_rating == "0","0.5").otherwise(player_profile2.player_rating))
 #print(player_profile2.show())
@@ -222,7 +221,8 @@ def winning_chance(player_profile,team1,team2,match_date):
                 except:
                     avg_chem += 0.5
 
-        avg_chem = avg_chem/10
+        avg_chem = avg_chem/20#20 because i,j added twice as i,j and j,i
+
         #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]
         #use regression to predict the player rating on the given date
         try:
@@ -252,7 +252,7 @@ def winning_chance(player_profile,team1,team2,match_date):
                     avg_chem += get_chemistry(i,j)
                 except:
                     avg_chem += 0.5
-        avg_chem = avg_chem/10
+        avg_chem = avg_chem/20
     
         #play_rating = player_profile2.filter(player_profile2.Id == i).select('player_rating').collect()[0][0]
         #use regression to predict the player rating on the given date
